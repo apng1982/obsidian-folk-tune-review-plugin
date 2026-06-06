@@ -47,3 +47,10 @@ The plugin must:
 - Preserving the old `pick` command.
 - Capturing free-text review notes.
 - Storing full review history. (Only the latest review state is stored.)
+
+## Useful links
+
+- [Old CLI - Folk tune reviewer GitHub repo](https://github.com/apng1982/obsidian-folk-tune-review)
+    - Also available locally at C:\Source\Cloud Awesome\obsidian-folk-tune-review
+- [Documentation for old CLI](https://docs.cloudawesome.uk/personal/obsidian-folk-tune-review/)
+- [Old CLI nugget package](https://www.nuget.org/packages/CloudAwesome.FolkTune.Reviewer)
