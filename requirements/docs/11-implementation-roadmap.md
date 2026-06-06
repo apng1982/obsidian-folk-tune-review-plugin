@@ -91,11 +91,17 @@ Acceptance criteria:
 - invalid scores are rejected;
 - write behaviour is tested.
 
----
 
-**Alpha mobile beta-testing check point**
+## Alpha Checkpoint 
 
----
+Goals: 
+
+- Manual testing of desktop plugin
+- Manual testing of mobile plugin
+- Review and extend test suite 
+- Create and populate public user documentation
+- Create initial README.md summary for Obsidian community consumption, with an overt reference to more extensive documentation.
+
 
 ## Phase 5: Stats
 
@@ -146,11 +152,16 @@ Acceptance criteria:
 - beta users can install without CLI;
 - mobile install/review/dry-run tested.
 
----
+## Beta Checkpoint
 
-**Beta mobile beta-testing checkpoint**
+Goals: 
 
----
+- Manual testing of desktop plugin
+- Manual testing of mobile plugin
+- Review and extend test suite, as required
+- Review and extend public user documentation
+- Review and extend README.md summary for Obsidian community consumption
+
 
 ## Phase 8: Public/community readiness
 
@@ -159,7 +170,7 @@ Goals:
 - improve README;
 - add screenshots/GIFs;
 - complete mobile checklist;
-- submit to community plugin process if desired.
+- submit to community plugin process
 
 Acceptance criteria:
 
