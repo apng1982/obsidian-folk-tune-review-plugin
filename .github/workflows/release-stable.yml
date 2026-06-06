@@ -2,11 +2,6 @@
 #
 # Create a normal GitHub release for the stable/community release channel.
 #
-# Important terminology:
-#   This workflow does not "push" anything to the Obsidian community directory.
-#   After the plugin has been accepted into the community plugin list, Obsidian
-#   checks your default branch manifest.json for the latest version and downloads
-#   release assets from a GitHub release whose tag exactly matches that version.
 #
 # Trigger:
 #   Push a stable numeric tag from a commit that is reachable from `main`.
