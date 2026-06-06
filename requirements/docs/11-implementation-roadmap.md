@@ -38,10 +38,13 @@ Acceptance criteria:
 
 Goals:
 
+2.1 (logic)
 - implement Obsidian tune repository;
 - scan configured tune folder;
 - map frontmatter to domain tune objects;
 - implement queue selection;
+
+2.2 (UI)
 - show full queue in a mobile-friendly UI;
 - write nothing.
 
@@ -58,7 +61,7 @@ Acceptance criteria:
 Goals:
 
 - run through the selected queue;
-- open tune notes;
+- open tune notes, without losing review session context;
 - select scores;
 - advance/skip/end session;
 - write nothing.
@@ -66,6 +69,7 @@ Goals:
 Acceptance criteria:
 
 - dry run can be completed;
+- dry review session recap is displayed;
 - score buttons show interval days;
 - writer port is not called;
 - dry run tests pass.
@@ -86,6 +90,10 @@ Acceptance criteria:
 - no history is written;
 - invalid scores are rejected;
 - write behaviour is tested.
+
+---
+** Alpha mobile beta-testing check point **
+---
 
 ## Phase 5: Stats
 
@@ -135,6 +143,10 @@ Acceptance criteria:
 - release contains `main.js`, `manifest.json`, `styles.css`;
 - beta users can install without CLI;
 - mobile install/review/dry-run tested.
+
+---
+** Beta mobile beta-testing checkpoint **
+---
 
 ## Phase 8: Public/community readiness
 
