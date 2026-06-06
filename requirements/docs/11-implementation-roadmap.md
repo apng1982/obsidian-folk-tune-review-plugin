@@ -92,7 +92,9 @@ Acceptance criteria:
 - write behaviour is tested.
 
 ---
-** Alpha mobile beta-testing check point **
+
+**Alpha mobile beta-testing check point**
+
 ---
 
 ## Phase 5: Stats
@@ -145,7 +147,9 @@ Acceptance criteria:
 - mobile install/review/dry-run tested.
 
 ---
-** Beta mobile beta-testing checkpoint **
+
+**Beta mobile beta-testing checkpoint**
+
 ---
 
 ## Phase 8: Public/community readiness
