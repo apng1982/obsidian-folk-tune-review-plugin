@@ -42,6 +42,7 @@ There is intentionally no `pick` command in the plugin. The old CLI `pick` behav
 - [`docs/10-release-and-distribution.md`](docs/10-release-and-distribution.md) — beta, GitHub release, mobile, and community plugin notes.
 - [`docs/11-implementation-roadmap.md`](docs/11-implementation-roadmap.md) — suggested development phases.
 - [`docs/12-codex-implementation-brief.md`](docs/12-codex-implementation-brief.md) — concise brief to give to Codex/agentic IDE tooling.
+- [`docs/13-mvp-decisions.md`](docs/13-mvp-decisions.md) — clarified MVP decisions and authoritative CLI behaviour.
 - [`adr/0001-recode-as-obsidian-plugin.md`](adr/0001-recode-as-obsidian-plugin.md) — decision record.
 
 ## Key external references

@@ -1,0 +1,10 @@
+{
+  "id": "folk-tune-review",
+  "name": "Folk Tune Review",
+  "version": "0.1.0",
+  "minAppVersion": "1.8.0",
+  "description": "Review and maintain a repertoire of folk tunes.",
+  "author": "Cloud Awesome",
+  "authorUrl": "https://cloudawesome.uk",
+  "isDesktopOnly": false
+}
