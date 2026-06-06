@@ -1,0 +1,208 @@
+# .github/workflows/release-stable.yml
+#
+# Create a normal GitHub release for the stable/community release channel.
+#
+# Important terminology:
+#   This workflow does not "push" anything to the Obsidian community directory.
+#   After the plugin has been accepted into the community plugin list, Obsidian
+#   checks your default branch manifest.json for the latest version and downloads
+#   release assets from a GitHub release whose tag exactly matches that version.
+#
+# Trigger:
+#   Push a stable numeric tag from a commit that is reachable from `main`.
+#
+# Accepted tag format:
+#   0.4.0
+#   0.4.1
+#   1.0.0
+#
+# Do not use a leading "v" for Obsidian plugin release tags.
+#
+# Manual stable release process:
+#   1. Finish beta testing from the `prerelease` branch using BRAT.
+#   2. Merge `prerelease` into `main`.
+#   3. Update manifest.json version to the stable version.
+#      Example: "0.4.0"
+#   4. If package.json has a version field, update it to the same version.
+#   5. Update versions.json so the stable version maps to the minimum supported
+#      Obsidian app version.
+#      Example:
+#        {
+#          "0.4.0": "1.8.0"
+#        }
+#   6. Commit and push `main`.
+#   7. Tag the exact main commit:
+#
+#        git checkout main
+#        git pull
+#        git tag 0.4.0
+#        git push origin 0.4.0
+#
+#   8. GitHub creates a normal release with:
+#        manifest.json
+#        main.js
+#        styles.css, if present
+#
+# After community acceptance:
+#   - Obsidian users can receive this version through the community plugin updater
+#     once the default-branch manifest.json version and GitHub release tag match.
+#
+# Safety checks:
+#   - The tag must be a stable N.N.N tag.
+#   - The tagged commit must be reachable from origin/main.
+#   - manifest.json version must exactly match the tag.
+#   - package.json version must exactly match the tag, if package.json has one.
+#   - versions.json must contain an entry for the tag.
+#   - manifest.json must contain isDesktopOnly=false.
+
+name: Release stable
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-stable-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "22"
+  RELEASE_BRANCH: "main"
+
+jobs:
+  release-stable:
+    name: Build and publish stable release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out tagged commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag and branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG="${GITHUB_REF_NAME}"
+          echo "Tag: ${TAG}"
+          echo "Commit: ${GITHUB_SHA}"
+
+          if [[ ! "${TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Stable release tags must match N.N.N, e.g. 0.4.0. Do not use beta/rc tags or a leading v."
+            exit 1
+          fi
+
+          git fetch origin "${RELEASE_BRANCH}:${RELEASE_BRANCH}" --force
+
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" "${RELEASE_BRANCH}"; then
+            echo "::error::Tagged commit must be reachable from origin/${RELEASE_BRANCH}."
+            echo "Create stable tags only from the main branch."
+            exit 1
+          fi
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate manifest/package/versions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          node <<'NODE'
+          const fs = require("fs");
+
+          const tag = process.env.GITHUB_REF_NAME;
+          const manifest = JSON.parse(fs.readFileSync("manifest.json", "utf8"));
+
+          if (manifest.version !== tag) {
+            console.error(`manifest.json version (${manifest.version}) must equal tag (${tag}).`);
+            process.exit(1);
+          }
+
+          if (manifest.isDesktopOnly !== false) {
+            console.error("manifest.json must contain \"isDesktopOnly\": false for this mobile-first plugin.");
+            process.exit(1);
+          }
+
+          if (fs.existsSync("package.json")) {
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            if (pkg.version && pkg.version !== tag) {
+              console.error(`package.json version (${pkg.version}) must equal tag (${tag}).`);
+              process.exit(1);
+            }
+          }
+
+          if (!fs.existsSync("versions.json")) {
+            console.error("versions.json is required for stable Obsidian plugin releases.");
+            process.exit(1);
+          }
+
+          const versions = JSON.parse(fs.readFileSync("versions.json", "utf8"));
+          if (!Object.prototype.hasOwnProperty.call(versions, tag)) {
+            console.error(`versions.json must contain an entry for ${tag}.`);
+            process.exit(1);
+          }
+
+          console.log("Manifest/package/versions checks passed.");
+          NODE
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build release assets
+        run: npm run build
+
+      - name: Prepare release asset directory
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf release-assets
+          mkdir release-assets
+
+          cp manifest.json release-assets/manifest.json
+          cp main.js release-assets/main.js
+
+          if [ -f styles.css ]; then
+            cp styles.css release-assets/styles.css
+          fi
+
+          echo "Release assets:"
+          find release-assets -maxdepth 1 -type f -print | sort
+
+      - name: Create GitHub stable release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            release-assets/*
+          body: |
+            Stable release.
+
+            Obsidian community release notes:
+            - This release is suitable for the community plugin update channel.
+            - The tag must exactly match manifest.json version.
+            - Release assets include manifest.json, main.js, and styles.css if present.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

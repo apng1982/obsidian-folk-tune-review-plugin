@@ -1,0 +1,90 @@
+# .github/workflows/ci.yml
+#
+# Continuous integration for every development path.
+#
+# Purpose:
+#   - Prove the plugin builds.
+#   - Prove the TypeScript/domain logic compiles.
+#   - Run the complete unit test suite.
+#   - Keep mobile-first constraints visible by failing early when tests/build fail.
+#
+# Manual steps:
+#   - None. This workflow runs automatically on pushes and pull requests.
+#
+# Expected package.json scripts:
+#   npm run lint
+#   npm run typecheck
+#   npm test
+#   npm run build
+#
+# If you do not have linting on day one, either add ESLint before enabling this
+# workflow or temporarily remove the lint step. The long-term requirement is that
+# CI remains strict.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - prerelease
+      - develop
+      - "feature/**"
+      - "bugfix/**"
+      - "hotfix/**"
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  verify:
+    name: Verify plugin
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build release assets
+        run: npm run build
+
+      - name: Verify expected Obsidian plugin assets exist
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f manifest.json
+          test -f main.js
+
+          # styles.css is optional for Obsidian plugins.
+          if [ -f styles.css ]; then
+            echo "styles.css found."
+          else
+            echo "styles.css not found; this is OK if the plugin has no CSS."
+          fi
