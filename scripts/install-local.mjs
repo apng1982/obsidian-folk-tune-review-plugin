@@ -45,8 +45,9 @@ import { constants } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const PROJECT_ROOT = path.resolve(new URL("..", import.meta.url).pathname);
+const PROJECT_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const REQUIRED_ASSETS = ["main.js", "manifest.json"];
 const OPTIONAL_ASSETS = ["styles.css"];
 

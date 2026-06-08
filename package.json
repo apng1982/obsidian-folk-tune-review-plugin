@@ -11,7 +11,7 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "install-local": "node scripts/install-local.mjs"
+    "install-local": "node scripts/install-local.mjs --vault C:\\Source\\Obsidian\\Tunes"
   },
   "keywords": [
     "obsidian",

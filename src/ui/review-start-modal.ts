@@ -74,12 +74,16 @@ export class ReviewStartModal extends Modal {
         });
       });
 
+    let buildQueueButton: HTMLButtonElement | undefined;
     new Setting(this.contentEl).addButton((button) => {
       button
         .setButtonText("Build queue")
         .setCta()
         .onClick(() => void this.submit());
+      buildQueueButton = button.buttonEl;
     });
+
+    window.setTimeout(() => buildQueueButton?.focus({ preventScroll: true }), 0);
   }
 
   override onClose(): void {
