@@ -1,1 +1,77 @@
-/* Plugin UI styles will be added with the first user-facing workflow. */
+.folk-tune-review-view {
+  padding: var(--size-4-4);
+}
+
+.folk-tune-review-read-only {
+  border-left: 3px solid var(--interactive-accent);
+  color: var(--text-muted);
+  padding-left: var(--size-4-3);
+}
+
+.folk-tune-review-queue {
+  display: grid;
+  gap: var(--size-4-3);
+  list-style-position: inside;
+  margin: var(--size-4-4) 0;
+  padding: 0;
+}
+
+.folk-tune-review-queue-item {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: var(--size-4-3);
+}
+
+.folk-tune-review-queue-item h3 {
+  display: inline;
+  margin: 0;
+}
+
+.folk-tune-review-metadata {
+  display: grid;
+  gap: var(--size-2-1);
+  margin-top: var(--size-4-2);
+}
+
+.folk-tune-review-metadata-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-1);
+}
+
+.folk-tune-review-metadata-label {
+  color: var(--text-muted);
+  font-weight: var(--font-semibold);
+}
+
+.folk-tune-review-score-reference {
+  border-top: 1px solid var(--background-modifier-border);
+  margin-top: var(--size-4-6);
+  padding-top: var(--size-4-4);
+}
+
+.folk-tune-review-score-grid {
+  display: grid;
+  gap: var(--size-4-2);
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+}
+
+.folk-tune-review-score {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  min-height: 2.75rem;
+  padding: var(--size-4-2);
+  text-align: center;
+}
+
+@media (max-width: 500px) {
+  .folk-tune-review-view {
+    padding: var(--size-4-2);
+  }
+
+  .folk-tune-review-score-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
