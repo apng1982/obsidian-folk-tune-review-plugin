@@ -6,6 +6,7 @@ import {
 } from "./application/build-review-queue";
 import { TuneFolderNotFoundError } from "./application/tune-folder-not-found-error";
 import type { Tune } from "./domain/tune";
+import { ObsidianNoteOpener } from "./obsidian/obsidian-note-opener";
 import { ObsidianTuneRepository } from "./obsidian/obsidian-tune-repository";
 import { SystemClock } from "./obsidian/system-clock";
 import {
@@ -28,7 +29,14 @@ export default class FolkTuneReviewPlugin extends Plugin {
 
     this.registerView(
       REVIEW_QUEUE_VIEW_TYPE,
-      (leaf) => new ReviewQueueView(leaf),
+      (leaf) =>
+        new ReviewQueueView(leaf, async (tune) => {
+          try {
+            await new ObsidianNoteOpener(this.app).openTune(tune);
+          } catch {
+            new Notice("Could not open tune note. It may have been moved or deleted.");
+          }
+        }),
     );
     this.addSettingTab(new FolkTuneReviewSettingsTab(this));
     this.addCommand({

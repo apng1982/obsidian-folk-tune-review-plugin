@@ -23,9 +23,40 @@
   padding: var(--size-4-3);
 }
 
-.folk-tune-review-queue-item h3 {
-  display: inline;
+.folk-tune-review-queue-item h4 {
   margin: 0;
+}
+
+.folk-tune-review-queue-item.is-current {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 1px var(--interactive-accent);
+}
+
+.folk-tune-review-queue-item.is-scored,
+.folk-tune-review-queue-item.is-skipped {
+  opacity: 0.75;
+}
+
+.folk-tune-review-queue-item-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+  justify-content: space-between;
+}
+
+.folk-tune-review-outcome {
+  background: var(--background-modifier-hover);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-size: var(--font-smallest);
+  padding: var(--size-2-1) var(--size-4-2);
+}
+
+.folk-tune-review-queue-open-note {
+  margin-top: var(--size-4-2);
+  min-height: 2.75rem;
+  width: 100%;
 }
 
 .folk-tune-review-metadata {
@@ -43,6 +74,86 @@
 .folk-tune-review-metadata-label {
   color: var(--text-muted);
   font-weight: var(--font-semibold);
+}
+
+.folk-tune-review-current,
+.folk-tune-review-recap {
+  background: var(--background-secondary);
+  border: 1px solid var(--interactive-accent);
+  border-radius: var(--radius-m);
+  margin: var(--size-4-4) 0;
+  padding: var(--size-4-4);
+}
+
+.folk-tune-review-current h3,
+.folk-tune-review-recap h3 {
+  margin-top: 0;
+}
+
+.folk-tune-review-current button {
+  margin-top: var(--size-4-3);
+  min-height: 2.75rem;
+  width: 100%;
+}
+
+.folk-tune-review-primary-action {
+  min-height: 3rem;
+  width: 100%;
+}
+
+.folk-tune-review-session-controls {
+  margin: var(--size-4-5) 0;
+}
+
+.folk-tune-review-score-button {
+  min-height: 3.5rem;
+  white-space: normal;
+}
+
+.folk-tune-review-secondary-actions {
+  display: grid;
+  gap: var(--size-4-2);
+  grid-template-columns: 1fr 1fr;
+  margin-top: var(--size-4-3);
+}
+
+.folk-tune-review-secondary-actions button {
+  min-height: 3rem;
+}
+
+.folk-tune-review-end-action {
+  color: var(--text-error);
+}
+
+.folk-tune-review-queue-heading {
+  margin-top: var(--size-4-6);
+}
+
+.folk-tune-review-summary {
+  display: grid;
+  gap: 0;
+}
+
+.folk-tune-review-summary-row {
+  display: grid;
+  gap: var(--size-4-3);
+  grid-template-columns: minmax(7rem, 1fr) minmax(4rem, 1fr);
+  padding: var(--size-4-2) var(--size-4-3);
+  text-align: left;
+}
+
+.folk-tune-review-summary-row:nth-child(odd) {
+  background: var(--background-secondary);
+}
+
+.folk-tune-review-summary-row:nth-child(even) {
+  background: var(--background-secondary-alt);
+}
+
+.folk-tune-review-summary dd {
+  font-weight: var(--font-semibold);
+  margin: 0;
+  text-align: left;
 }
 
 .folk-tune-review-score-reference {
@@ -73,5 +184,9 @@
 
   .folk-tune-review-score-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .folk-tune-review-secondary-actions {
+    grid-template-columns: 1fr;
   }
 }
