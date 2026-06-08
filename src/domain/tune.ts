@@ -11,7 +11,7 @@ export interface Tune {
   readonly id?: string;
   readonly keys: readonly string[];
   readonly learn?: boolean;
-  readonly origins: readonly string[];
+  readonly origin?: string;
   readonly path: string;
   readonly review: TuneReview;
   readonly title: string;
