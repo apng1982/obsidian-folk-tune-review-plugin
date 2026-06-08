@@ -8,6 +8,12 @@
   padding-left: var(--size-4-3);
 }
 
+.folk-tune-review-live {
+  border-left: 3px solid var(--text-warning);
+  color: var(--text-muted);
+  padding-left: var(--size-4-3);
+}
+
 .folk-tune-review-queue {
   display: grid;
   gap: var(--size-4-3);

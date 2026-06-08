@@ -1,13 +1,16 @@
 import { ItemView, type WorkspaceLeaf } from "obsidian";
 
-import { DryRunReviewSession } from "../application/dry-run-review-session";
+import { ReviewSessionController } from "../application/review-session-controller";
+import type { ReviewMode } from "../domain/review-mode";
 import {
   getCurrentTune,
-  summarizeDryRunSession,
+  summarizeReviewSession,
   type ReviewSession,
   type ReviewSessionItemOutcome,
 } from "../domain/review-session";
 import type { Tune } from "../domain/tune";
+import type { Clock } from "../ports/clock";
+import type { ReviewWriter } from "../ports/review-writer";
 import {
   buildReviewQueueItemModel,
   buildScoreIntervalModels,
@@ -17,11 +20,16 @@ export const REVIEW_QUEUE_VIEW_TYPE = "folk-tune-review-queue";
 
 export class ReviewQueueView extends ItemView {
   private queue: readonly Tune[] = [];
-  private dryRun?: DryRunReviewSession;
+  private mode: ReviewMode = "live";
+  private reviewSession?: ReviewSessionController;
+  private writeInProgress = false;
 
   constructor(
     leaf: WorkspaceLeaf,
+    private readonly clock: Clock,
+    private readonly writer: ReviewWriter,
     private readonly openTune: (tune: Tune) => Promise<void>,
+    private readonly onWriteError: () => void,
   ) {
     super(leaf);
   }
@@ -39,9 +47,10 @@ export class ReviewQueueView extends ItemView {
     return Promise.resolve();
   }
 
-  setQueue(queue: readonly Tune[]): void {
+  setQueue(queue: readonly Tune[], mode: ReviewMode): void {
     this.queue = queue;
-    this.dryRun = undefined;
+    this.mode = mode;
+    this.reviewSession = undefined;
     this.render();
   }
 
@@ -51,28 +60,39 @@ export class ReviewQueueView extends ItemView {
     container.addClass("folk-tune-review-view");
 
     container.createEl("h2", {
-      text: this.dryRun === undefined ? "Review queue" : "Dry-run review",
+      text:
+        this.reviewSession === undefined
+          ? "Review queue"
+          : this.mode === "live"
+            ? "Live review"
+            : "Dry-run review",
     });
-    this.renderDryRunNotice(container);
+    this.renderModeNotice(container);
 
     if (this.queue.length === 0) {
       container.createEl("p", {
         cls: "folk-tune-review-empty",
         text: "No eligible tunes matched these review options.",
       });
-    } else if (this.dryRun === undefined) {
+    } else if (this.reviewSession === undefined) {
       this.renderPreview(container);
-    } else if (this.dryRun.session.status === "active") {
-      this.renderActiveSession(container, this.dryRun.session);
+    } else if (this.reviewSession.session.status === "active") {
+      this.renderActiveSession(container, this.reviewSession.session);
     } else {
-      this.renderRecap(container, this.dryRun.session);
+      this.renderRecap(container, this.reviewSession.session);
     }
   }
 
-  private renderDryRunNotice(container: HTMLElement): void {
+  private renderModeNotice(container: HTMLElement): void {
     container.createEl("p", {
-      cls: "folk-tune-review-read-only",
-      text: "Dry run. No tune notes will be changed.",
+      cls:
+        this.mode === "live"
+          ? "folk-tune-review-live"
+          : "folk-tune-review-read-only",
+      text:
+        this.mode === "live"
+          ? "Live review. Scoring a tune will update its review metadata."
+          : "Dry run. No tune notes will be changed.",
     });
   }
 
@@ -82,10 +102,15 @@ export class ReviewQueueView extends ItemView {
     });
     this.renderActionButton(
       container,
-      "Start dry run",
+      this.mode === "live" ? "Start live review" : "Start dry run",
       "folk-tune-review-primary-action",
       () => {
-        this.dryRun = new DryRunReviewSession(this.queue);
+        this.reviewSession = new ReviewSessionController(
+          this.queue,
+          this.mode,
+          this.clock,
+          this.writer,
+        );
         this.render();
       },
     );
@@ -136,6 +161,9 @@ export class ReviewQueueView extends ItemView {
       cls: "folk-tune-review-session-controls",
     });
     section.createEl("h3", { text: "Choose a score" });
+    if (this.writeInProgress) {
+      section.createEl("p", { text: "Saving review metadata..." });
+    }
     const scoreGrid = section.createDiv({
       cls: "folk-tune-review-score-grid folk-tune-review-score-controls",
     });
@@ -145,12 +173,8 @@ export class ReviewQueueView extends ItemView {
         scoreGrid,
         interval.label,
         "folk-tune-review-score-button",
-        () => {
-          if (this.dryRun !== undefined) {
-            this.dryRun.score(interval.score);
-            this.render();
-          }
-        },
+        () => void this.scoreCurrentTune(interval.score),
+        this.writeInProgress,
       );
     }
 
@@ -158,32 +182,55 @@ export class ReviewQueueView extends ItemView {
       cls: "folk-tune-review-secondary-actions",
     });
     this.renderActionButton(secondaryActions, "Skip tune", "", () => {
-      if (this.dryRun !== undefined) {
-        this.dryRun.skip();
+      if (this.reviewSession !== undefined) {
+        this.reviewSession.skip();
         this.render();
       }
-    });
+    }, this.writeInProgress);
     this.renderActionButton(
       secondaryActions,
-      "End dry run",
+      this.mode === "live" ? "End review" : "End dry run",
       "folk-tune-review-end-action",
       () => {
-        if (this.dryRun !== undefined) {
-          this.dryRun.end();
+        if (this.reviewSession !== undefined) {
+          this.reviewSession.end();
           this.render();
         }
       },
+      this.writeInProgress,
     );
   }
 
+  private async scoreCurrentTune(score: number): Promise<void> {
+    if (this.reviewSession === undefined || this.writeInProgress) {
+      return;
+    }
+
+    this.writeInProgress = true;
+    this.render();
+    try {
+      await this.reviewSession.score(score);
+    } catch {
+      this.onWriteError();
+    } finally {
+      this.writeInProgress = false;
+      this.render();
+    }
+  }
+
   private renderRecap(container: HTMLElement, session: ReviewSession): void {
-    const summary = summarizeDryRunSession(session);
+    const summary = summarizeReviewSession(session, this.mode);
     const section = container.createEl("section", {
       cls: "folk-tune-review-recap",
     });
-    section.createEl("h3", { text: "Dry-run recap" });
+    section.createEl("h3", {
+      text: this.mode === "live" ? "Review recap" : "Dry-run recap",
+    });
     section.createEl("p", {
-      cls: "folk-tune-review-read-only",
+      cls:
+        this.mode === "live"
+          ? "folk-tune-review-live"
+          : "folk-tune-review-read-only",
       text: summary.message,
     });
     const list = section.createEl("dl", {
@@ -194,7 +241,7 @@ export class ReviewQueueView extends ItemView {
     this.renderSummaryValue(list, "Skipped", summary.skipped);
     this.renderSummaryValue(list, "Unreviewed", summary.unreviewed);
     this.renderActionButton(section, "Return to queue preview", "", () => {
-      this.dryRun = undefined;
+      this.reviewSession = undefined;
       this.render();
     });
     this.renderQueue(container, session);
@@ -299,12 +346,14 @@ export class ReviewQueueView extends ItemView {
     label: string,
     className: string,
     action: () => void,
+    disabled = false,
   ): void {
     const button = container.createEl("button", {
       cls: className,
       text: label,
       type: "button",
     });
+    button.disabled = disabled;
     button.addEventListener("click", action);
   }
 

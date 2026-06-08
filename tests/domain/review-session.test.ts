@@ -1,19 +1,20 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  createDryRunReviewSession,
+  createReviewSession,
   endReviewSession,
   getCurrentTune,
   scoreCurrentTune,
   skipCurrentTune,
   summarizeDryRunSession,
+  summarizeReviewSession,
 } from "../../src/domain/review-session";
 import type { Tune } from "../../src/domain/tune";
 
 describe("dry-run review session", () => {
   it("starts at the first tune while preserving the full queue", () => {
     const queue = [tune("one"), tune("two")];
-    const session = createDryRunReviewSession(queue);
+    const session = createReviewSession(queue);
 
     expect(session.status).toBe("active");
     expect(getCurrentTune(session)).toBe(queue[0]);
@@ -24,7 +25,7 @@ describe("dry-run review session", () => {
   });
 
   it("completes an empty queue immediately", () => {
-    const session = createDryRunReviewSession([]);
+    const session = createReviewSession([]);
 
     expect(session.status).toBe("completed");
     expect(getCurrentTune(session)).toBeUndefined();
@@ -33,7 +34,7 @@ describe("dry-run review session", () => {
   it("records a score and advances without changing the tune metadata", () => {
     const originalTune = tune("one");
     const session = scoreCurrentTune(
-      createDryRunReviewSession([originalTune, tune("two")]),
+      createReviewSession([originalTune, tune("two")]),
       9,
     );
 
@@ -43,7 +44,7 @@ describe("dry-run review session", () => {
   });
 
   it("rejects an invalid score before advancing", () => {
-    const session = createDryRunReviewSession([tune("one")]);
+    const session = createReviewSession([tune("one")]);
     expect(() => scoreCurrentTune(session, 10)).toThrow(RangeError);
     expect(getCurrentTune(session)?.id).toBe("one");
   });
@@ -51,7 +52,7 @@ describe("dry-run review session", () => {
   it("skips a tune without changing it and advances", () => {
     const originalTune = tune("one");
     const session = skipCurrentTune(
-      createDryRunReviewSession([originalTune, tune("two")]),
+      createReviewSession([originalTune, tune("two")]),
     );
 
     expect(session.items[0]?.outcome).toEqual({ type: "skipped" });
@@ -61,7 +62,7 @@ describe("dry-run review session", () => {
 
   it("completes after the final tune is handled", () => {
     const session = scoreCurrentTune(
-      skipCurrentTune(createDryRunReviewSession([tune("one"), tune("two")])),
+      skipCurrentTune(createReviewSession([tune("one"), tune("two")])),
       0,
     );
 
@@ -72,7 +73,7 @@ describe("dry-run review session", () => {
   it("ends early leaving pending tunes unreviewed", () => {
     const session = endReviewSession(
       scoreCurrentTune(
-        createDryRunReviewSession([tune("one"), tune("two"), tune("three")]),
+        createReviewSession([tune("one"), tune("two"), tune("three")]),
         5,
       ),
     );
@@ -84,7 +85,7 @@ describe("dry-run review session", () => {
   });
 
   it("does not allow scoring or skipping after completion", () => {
-    const completed = scoreCurrentTune(createDryRunReviewSession([tune("one")]), 1);
+    const completed = scoreCurrentTune(createReviewSession([tune("one")]), 1);
 
     expect(() => scoreCurrentTune(completed, 1)).toThrow(
       "Review session is not active.",
@@ -99,7 +100,7 @@ describe("dry-run review session", () => {
     const session = endReviewSession(
       skipCurrentTune(
         scoreCurrentTune(
-          createDryRunReviewSession([tune("one"), tune("two"), tune("three")]),
+          createReviewSession([tune("one"), tune("two"), tune("three")]),
           4,
         ),
       ),
@@ -112,6 +113,17 @@ describe("dry-run review session", () => {
       total: 3,
       unreviewed: 1,
     });
+  });
+
+  it("creates a live recap that confirms reviewed metadata was saved", () => {
+    const session = scoreCurrentTune(
+      createReviewSession([tune("one")]),
+      4,
+    );
+
+    expect(summarizeReviewSession(session, "live").message).toBe(
+      "Live review complete. Reviewed tune metadata was saved.",
+    );
   });
 });
 

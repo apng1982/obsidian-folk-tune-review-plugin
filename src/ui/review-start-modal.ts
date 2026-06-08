@@ -1,30 +1,37 @@
 import { Modal, Notice, Setting } from "obsidian";
 
 import type { BuildReviewQueueOptions } from "../application/build-review-queue";
+import type { ReviewMode } from "../domain/review-mode";
 
 export interface ReviewStartDefaults {
   readonly count: number;
   readonly includeExcluded: boolean;
   readonly includeSessionMaintained: boolean;
+  readonly mode: ReviewMode;
+}
+
+export interface ReviewStartRequest {
+  readonly mode: ReviewMode;
+  readonly selectionOptions: BuildReviewQueueOptions;
 }
 
 export class ReviewStartModal extends Modal {
   private count: number;
   private includeExcluded: boolean;
   private includeSessionMaintained: boolean;
+  private mode: ReviewMode;
   private originFilter = "";
 
   constructor(
     app: ConstructorParameters<typeof Modal>[0],
     defaults: ReviewStartDefaults,
-    private readonly onBuildQueue: (
-      options: BuildReviewQueueOptions,
-    ) => Promise<boolean>,
+    private readonly onBuildQueue: (request: ReviewStartRequest) => Promise<boolean>,
   ) {
     super(app);
     this.count = defaults.count;
     this.includeExcluded = defaults.includeExcluded;
     this.includeSessionMaintained = defaults.includeSessionMaintained;
+    this.mode = defaults.mode;
   }
 
   override onOpen(): void {
@@ -32,8 +39,21 @@ export class ReviewStartModal extends Modal {
     this.contentEl.addClass("folk-tune-review-setup");
 
     this.contentEl.createEl("p", {
-      text: "Choose the tunes to include in this read-only queue preview.",
+      text: "Choose the tunes to include and whether the review should write changes.",
     });
+
+    new Setting(this.contentEl)
+      .setName("Review mode")
+      .setDesc("Live reviews update tune metadata. Dry runs write nothing.")
+      .addDropdown((dropdown) => {
+        dropdown
+          .addOption("live", "Live review")
+          .addOption("dry-run", "Dry run")
+          .setValue(this.mode)
+          .onChange((value) => {
+            this.mode = value === "dry-run" ? "dry-run" : "live";
+          });
+      });
 
     new Setting(this.contentEl)
       .setName("Number of tunes")
@@ -97,11 +117,14 @@ export class ReviewStartModal extends Modal {
     }
 
     const queueBuilt = await this.onBuildQueue({
-      count: this.count,
-      includeExcluded: this.includeExcluded,
-      includeSessionMaintained: this.includeSessionMaintained,
-      originFilter: this.originFilter.trim() || undefined,
-      randomize: true,
+      mode: this.mode,
+      selectionOptions: {
+        count: this.count,
+        includeExcluded: this.includeExcluded,
+        includeSessionMaintained: this.includeSessionMaintained,
+        originFilter: this.originFilter.trim() || undefined,
+        randomize: true,
+      },
     });
     if (queueBuilt) {
       this.close();

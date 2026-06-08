@@ -1,4 +1,5 @@
 import { parseReviewScore, type ReviewScore } from "./review-score";
+import type { ReviewMode } from "./review-mode";
 import type { Tune } from "./tune";
 
 export type ReviewSessionStatus = "active" | "completed" | "ended";
@@ -27,9 +28,7 @@ export interface ReviewSessionSummary {
   readonly unreviewed: number;
 }
 
-export function createDryRunReviewSession(
-  queue: readonly Tune[],
-): ReviewSession {
+export function createReviewSession(queue: readonly Tune[]): ReviewSession {
   const items = queue.map((tune) => ({
     outcome: { type: "pending" } as const,
     tune,
@@ -80,6 +79,13 @@ export function getCurrentTune(session: ReviewSession): Tune | undefined {
 export function summarizeDryRunSession(
   session: ReviewSession,
 ): ReviewSessionSummary {
+  return summarizeReviewSession(session, "dry-run");
+}
+
+export function summarizeReviewSession(
+  session: ReviewSession,
+  mode: ReviewMode,
+): ReviewSessionSummary {
   const scored = session.items.filter(
     ({ outcome }) => outcome.type === "scored",
   ).length;
@@ -89,7 +95,10 @@ export function summarizeDryRunSession(
   const unreviewed = session.items.length - scored - skipped;
 
   return {
-    message: "Dry run complete. No tune metadata was changed.",
+    message:
+      mode === "dry-run"
+        ? "Dry run complete. No tune metadata was changed."
+        : "Live review complete. Reviewed tune metadata was saved.",
     scored,
     skipped,
     total: session.items.length,
