@@ -28,6 +28,7 @@ export class ReviewQueueView extends ItemView {
     leaf: WorkspaceLeaf,
     private readonly clock: Clock,
     private readonly writer: ReviewWriter,
+    private readonly previewTune: (tune: Tune) => Promise<void>,
     private readonly openTune: (tune: Tune) => Promise<void>,
     private readonly onWriteError: () => void,
   ) {
@@ -151,9 +152,7 @@ export class ReviewQueueView extends ItemView {
     this.renderMetadata(metadata, "Key", item.keys);
     this.renderMetadata(metadata, "Origin", item.origin);
     this.renderMetadata(metadata, "Composer", item.composer);
-    this.renderActionButton(section, "Open note", "", () => {
-      void this.openTune(tune);
-    });
+    this.renderNoteActions(section, tune);
   }
 
   private renderSessionControls(container: HTMLElement): void {
@@ -313,10 +312,25 @@ export class ReviewQueueView extends ItemView {
     this.renderMetadata(metadata, "Key", item.keys);
     this.renderMetadata(metadata, "Origin", item.origin);
     this.renderMetadata(metadata, "Composer", item.composer);
+    this.renderNoteActions(listItem, tune);
+  }
+
+  private renderNoteActions(container: HTMLElement, tune: Tune): void {
+    const actions = container.createDiv({
+      cls: "folk-tune-review-note-actions",
+    });
     this.renderActionButton(
-      listItem,
-      "Open note",
-      "folk-tune-review-queue-open-note",
+      actions,
+      "Preview",
+      "",
+      () => {
+        void this.previewTune(tune);
+      },
+    );
+    this.renderActionButton(
+      actions,
+      "Open in new tab",
+      "",
       () => {
         void this.openTune(tune);
       },

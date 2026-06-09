@@ -59,9 +59,16 @@
   padding: var(--size-2-1) var(--size-4-2);
 }
 
-.folk-tune-review-queue-open-note {
-  margin-top: var(--size-4-2);
+.folk-tune-review-note-actions {
+  display: grid;
+  gap: var(--size-4-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--size-4-3);
+}
+
+.folk-tune-review-note-actions button {
   min-height: 2.75rem;
+  white-space: normal;
   width: 100%;
 }
 
@@ -100,6 +107,14 @@
   margin-top: var(--size-4-3);
   min-height: 2.75rem;
   width: 100%;
+}
+
+.folk-tune-review-current .folk-tune-review-note-actions button {
+  margin-top: 0;
+}
+
+.folk-tune-review-note-preview {
+  overflow-y: auto;
 }
 
 .folk-tune-review-primary-action {

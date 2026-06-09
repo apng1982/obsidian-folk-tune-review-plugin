@@ -7,6 +7,7 @@ import { TuneFolderNotFoundError } from "./application/tune-folder-not-found-err
 import type { ReviewMode } from "./domain/review-mode";
 import type { Tune } from "./domain/tune";
 import { ObsidianNoteOpener } from "./obsidian/obsidian-note-opener";
+import { ObsidianNoteReader } from "./obsidian/obsidian-note-reader";
 import { ObsidianReviewWriter } from "./obsidian/obsidian-review-writer";
 import { ObsidianTuneRepository } from "./obsidian/obsidian-tune-repository";
 import { SystemClock } from "./obsidian/system-clock";
@@ -19,6 +20,7 @@ import {
   REVIEW_QUEUE_VIEW_TYPE,
   ReviewQueueView,
 } from "./ui/review-queue-view";
+import { NotePreviewModal } from "./ui/note-preview-modal";
 import { ReviewStartModal } from "./ui/review-start-modal";
 import type { ReviewStartRequest } from "./ui/review-start-modal";
 import { FolkTuneReviewSettingsTab } from "./ui/settings-tab";
@@ -36,6 +38,16 @@ export default class FolkTuneReviewPlugin extends Plugin {
           leaf,
           new SystemClock(),
           new ObsidianReviewWriter(this.app),
+          async (tune) => {
+            try {
+              const note = await new ObsidianNoteReader(this.app).readTune(tune);
+              new NotePreviewModal(this.app, note).open();
+            } catch {
+              new Notice(
+                "Could not preview tune note. It may have been moved or deleted.",
+              );
+            }
+          },
           async (tune) => {
             try {
               await new ObsidianNoteOpener(this.app).openTune(tune);
