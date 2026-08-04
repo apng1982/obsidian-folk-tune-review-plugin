@@ -188,6 +188,20 @@ export class ReviewQueueView extends ItemView {
     }, this.writeInProgress);
     this.renderActionButton(
       secondaryActions,
+      "Exclude from reviews",
+      "",
+      () => void this.excludeCurrentTune(),
+      this.writeInProgress,
+    );
+    this.renderActionButton(
+      secondaryActions,
+      "Mark as session maintained",
+      "",
+      () => void this.markCurrentTuneSessionMaintained(),
+      this.writeInProgress,
+    );
+    this.renderActionButton(
+      secondaryActions,
       this.mode === "live" ? "End review" : "End dry run",
       "folk-tune-review-end-action",
       () => {
@@ -198,6 +212,40 @@ export class ReviewQueueView extends ItemView {
       },
       this.writeInProgress,
     );
+  }
+
+  private async excludeCurrentTune(): Promise<void> {
+    if (this.reviewSession === undefined || this.writeInProgress) {
+      return;
+    }
+
+    this.writeInProgress = true;
+    this.render();
+    try {
+      await this.reviewSession.exclude();
+    } catch {
+      this.onWriteError();
+    } finally {
+      this.writeInProgress = false;
+      this.render();
+    }
+  }
+
+  private async markCurrentTuneSessionMaintained(): Promise<void> {
+    if (this.reviewSession === undefined || this.writeInProgress) {
+      return;
+    }
+
+    this.writeInProgress = true;
+    this.render();
+    try {
+      await this.reviewSession.markSessionMaintained();
+    } catch {
+      this.onWriteError();
+    } finally {
+      this.writeInProgress = false;
+      this.render();
+    }
   }
 
   private async scoreCurrentTune(score: number): Promise<void> {
@@ -237,6 +285,16 @@ export class ReviewQueueView extends ItemView {
     });
     this.renderSummaryValue(list, "Selected", summary.total);
     this.renderSummaryValue(list, "Scored", summary.scored);
+    if (summary.excluded > 0) {
+      this.renderSummaryValue(list, "Excluded", summary.excluded);
+    }
+    if (summary.sessionMaintained > 0) {
+      this.renderSummaryValue(
+        list,
+        "Session-maintained",
+        summary.sessionMaintained,
+      );
+    }
     this.renderSummaryValue(list, "Skipped", summary.skipped);
     this.renderSummaryValue(list, "Unreviewed", summary.unreviewed);
     this.renderActionButton(section, "Return to queue preview", "", () => {
@@ -348,6 +406,10 @@ export class ReviewQueueView extends ItemView {
     switch (outcome.type) {
       case "scored":
         return `Score ${outcome.score}`;
+      case "excluded":
+        return "Excluded";
+      case "session-maintained":
+        return "Session-maintained";
       case "skipped":
         return "Skipped";
       case "pending":

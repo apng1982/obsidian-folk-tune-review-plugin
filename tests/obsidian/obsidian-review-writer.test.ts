@@ -51,6 +51,30 @@ describe("Obsidian review writer", () => {
     ).rejects.toThrow("Tune note not found");
     expect(processFrontMatter).not.toHaveBeenCalled();
   });
+
+  it("writes review flags through processFrontMatter using the tune path", async () => {
+    const file = { path: "Tunes/Tunes/one.md" };
+    const frontmatter: Record<string, unknown> = { id: "one" };
+    const processFrontMatter = vi.fn(
+      (_file: unknown, mutate: (value: Record<string, unknown>) => void) => {
+        mutate(frontmatter);
+        return Promise.resolve();
+      },
+    );
+    const app = {
+      fileManager: { processFrontMatter },
+      vault: { getFileByPath: vi.fn().mockReturnValue(file) },
+    };
+    const writer = new ObsidianReviewWriter(app as never);
+
+    await writer.writeReviewFlag(tune("one"), "sessionMaintained");
+
+    expect(app.vault.getFileByPath).toHaveBeenCalledWith("Tunes/Tunes/one.md");
+    expect(processFrontMatter).toHaveBeenCalledWith(file, expect.any(Function));
+    expect(frontmatter.review).toEqual({
+      sessionMaintained: true,
+    });
+  });
 });
 
 function tune(id: string): Tune {

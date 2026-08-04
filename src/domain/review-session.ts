@@ -6,7 +6,9 @@ export type ReviewSessionStatus = "active" | "completed" | "ended";
 
 export type ReviewSessionItemOutcome =
   | { readonly type: "pending" }
+  | { readonly type: "excluded" }
   | { readonly score: ReviewScore; readonly type: "scored" }
+  | { readonly type: "session-maintained" }
   | { readonly type: "skipped" };
 
 export interface ReviewSessionItem {
@@ -21,8 +23,10 @@ export interface ReviewSession {
 }
 
 export interface ReviewSessionSummary {
+  readonly excluded: number;
   readonly message: string;
   readonly scored: number;
+  readonly sessionMaintained: number;
   readonly skipped: number;
   readonly total: number;
   readonly unreviewed: number;
@@ -59,6 +63,18 @@ export function skipCurrentTune(session: ReviewSession): ReviewSession {
   return advanceSession(session, { type: "skipped" });
 }
 
+export function excludeCurrentTune(session: ReviewSession): ReviewSession {
+  assertActiveSession(session);
+  return advanceSession(session, { type: "excluded" });
+}
+
+export function markCurrentTuneSessionMaintained(
+  session: ReviewSession,
+): ReviewSession {
+  assertActiveSession(session);
+  return advanceSession(session, { type: "session-maintained" });
+}
+
 export function endReviewSession(session: ReviewSession): ReviewSession {
   if (session.status !== "active") {
     return session;
@@ -89,17 +105,26 @@ export function summarizeReviewSession(
   const scored = session.items.filter(
     ({ outcome }) => outcome.type === "scored",
   ).length;
+  const excluded = session.items.filter(
+    ({ outcome }) => outcome.type === "excluded",
+  ).length;
+  const sessionMaintained = session.items.filter(
+    ({ outcome }) => outcome.type === "session-maintained",
+  ).length;
   const skipped = session.items.filter(
     ({ outcome }) => outcome.type === "skipped",
   ).length;
-  const unreviewed = session.items.length - scored - skipped;
+  const unreviewed =
+    session.items.length - scored - excluded - sessionMaintained - skipped;
 
   return {
+    excluded,
     message:
       mode === "dry-run"
         ? "Dry run complete. No tune metadata was changed."
         : "Live review complete. Reviewed tune metadata was saved.",
     scored,
+    sessionMaintained,
     skipped,
     total: session.items.length,
     unreviewed,

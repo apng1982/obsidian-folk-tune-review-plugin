@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   createReviewSession,
   endReviewSession,
+  excludeCurrentTune,
   getCurrentTune,
+  markCurrentTuneSessionMaintained,
   scoreCurrentTune,
   skipCurrentTune,
   summarizeDryRunSession,
@@ -60,6 +62,28 @@ describe("dry-run review session", () => {
     expect(originalTune.review.state).toBeUndefined();
   });
 
+  it("records excluded tunes without changing them and advances", () => {
+    const originalTune = tune("one");
+    const session = excludeCurrentTune(
+      createReviewSession([originalTune, tune("two")]),
+    );
+
+    expect(session.items[0]?.outcome).toEqual({ type: "excluded" });
+    expect(getCurrentTune(session)?.id).toBe("two");
+    expect(originalTune.review.state).toBeUndefined();
+  });
+
+  it("records session-maintained tunes without changing them and advances", () => {
+    const originalTune = tune("one");
+    const session = markCurrentTuneSessionMaintained(
+      createReviewSession([originalTune, tune("two")]),
+    );
+
+    expect(session.items[0]?.outcome).toEqual({ type: "session-maintained" });
+    expect(getCurrentTune(session)?.id).toBe("two");
+    expect(originalTune.review.state).toBeUndefined();
+  });
+
   it("completes after the final tune is handled", () => {
     const session = scoreCurrentTune(
       skipCurrentTune(createReviewSession([tune("one"), tune("two")])),
@@ -107,10 +131,40 @@ describe("dry-run review session", () => {
     );
 
     expect(summarizeDryRunSession(session)).toEqual({
+      excluded: 0,
       message: "Dry run complete. No tune metadata was changed.",
       scored: 1,
+      sessionMaintained: 0,
       skipped: 1,
       total: 3,
+      unreviewed: 1,
+    });
+  });
+
+  it("counts flagged tunes as handled in the recap", () => {
+    const session = endReviewSession(
+      markCurrentTuneSessionMaintained(
+        excludeCurrentTune(
+          scoreCurrentTune(
+            createReviewSession([
+              tune("one"),
+              tune("two"),
+              tune("three"),
+              tune("four"),
+            ]),
+            4,
+          ),
+        ),
+      ),
+    );
+
+    expect(summarizeReviewSession(session, "live")).toEqual({
+      excluded: 1,
+      message: "Live review complete. Reviewed tune metadata was saved.",
+      scored: 1,
+      sessionMaintained: 1,
+      skipped: 0,
+      total: 4,
       unreviewed: 1,
     });
   });

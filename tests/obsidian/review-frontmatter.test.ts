@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { parseLocalDate } from "../../src/domain/dates";
 import { createReviewState } from "../../src/domain/review-state";
-import { applyReviewStateToFrontmatter } from "../../src/obsidian/review-frontmatter";
+import {
+  applyReviewFlagToFrontmatter,
+  applyReviewStateToFrontmatter,
+} from "../../src/obsidian/review-frontmatter";
 
 describe("review frontmatter mutation", () => {
   it("adds nested latest review state without changing unrelated frontmatter", () => {
@@ -72,11 +75,58 @@ describe("review frontmatter mutation", () => {
     expect(frontmatter.review).not.toHaveProperty("history");
   });
 
+  it("sets a review flag without writing score or date metadata", () => {
+    const frontmatter: Record<string, unknown> = {
+      composer: "(trad.)",
+      id: "one",
+    };
+
+    applyReviewFlagToFrontmatter(frontmatter, "excludedFromReview");
+
+    expect(frontmatter).toEqual({
+      composer: "(trad.)",
+      id: "one",
+      review: {
+        excludedFromReview: true,
+      },
+    });
+  });
+
+  it("sets a review flag while preserving existing review state", () => {
+    const frontmatter: Record<string, unknown> = {
+      review: {
+        intervalDays: 365,
+        lastReviewed: "2026-06-08",
+        nextDue: "2027-06-08",
+        score: 9,
+      },
+    };
+
+    applyReviewFlagToFrontmatter(frontmatter, "sessionMaintained");
+
+    expect(frontmatter.review).toEqual({
+      intervalDays: 365,
+      lastReviewed: "2026-06-08",
+      nextDue: "2027-06-08",
+      score: 9,
+      sessionMaintained: true,
+    });
+  });
+
   it("rejects malformed existing review metadata", () => {
     expect(() =>
       applyReviewStateToFrontmatter(
         { review: "invalid" },
         createReviewState(parseLocalDate("2026-06-08"), 3),
+      ),
+    ).toThrow("Review metadata must be an object.");
+  });
+
+  it("rejects malformed existing review metadata before setting a flag", () => {
+    expect(() =>
+      applyReviewFlagToFrontmatter(
+        { review: "invalid" },
+        "sessionMaintained",
       ),
     ).toThrow("Review metadata must be an object.");
   });

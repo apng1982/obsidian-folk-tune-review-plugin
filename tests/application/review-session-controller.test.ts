@@ -13,7 +13,7 @@ describe("review session controller", () => {
   it("writes expected latest review state before advancing a live session", async () => {
     const first = tune("one");
     const second = tune("two");
-    const writer = { writeReview: vi.fn().mockResolvedValue(undefined) };
+    const writer = reviewWriter();
     const controller = new ReviewSessionController(
       [first, second],
       "live",
@@ -33,7 +33,7 @@ describe("review session controller", () => {
   });
 
   it("maps score zero to one day in live mode", async () => {
-    const writer = { writeReview: vi.fn().mockResolvedValue(undefined) };
+    const writer = reviewWriter();
     const controller = new ReviewSessionController(
       [tune("one")],
       "live",
@@ -54,7 +54,7 @@ describe("review session controller", () => {
   });
 
   it("rejects an invalid score before a live write", async () => {
-    const writer = { writeReview: vi.fn().mockResolvedValue(undefined) };
+    const writer = reviewWriter();
     const controller = new ReviewSessionController(
       [tune("one")],
       "live",
@@ -68,9 +68,8 @@ describe("review session controller", () => {
   });
 
   it("does not advance when a live write fails", async () => {
-    const writer = {
-      writeReview: vi.fn().mockRejectedValue(new Error("write failed")),
-    };
+    const writer = reviewWriter();
+    writer.writeReview.mockRejectedValue(new Error("write failed"));
     const controller = new ReviewSessionController(
       [tune("one"), tune("two")],
       "live",
@@ -83,12 +82,75 @@ describe("review session controller", () => {
     expect(controller.session.items[0]?.outcome.type).toBe("pending");
   });
 
-  it("never calls the writer in dry-run mode", async () => {
-    const writer = { writeReview: vi.fn().mockResolvedValue(undefined) };
-    const first = frozenTune("one");
-    const second = frozenTune("two");
+  it("writes an excluded flag before advancing a live session", async () => {
+    const first = tune("one");
+    const second = tune("two");
+    const writer = reviewWriter();
     const controller = new ReviewSessionController(
       [first, second],
+      "live",
+      clock,
+      writer,
+    );
+
+    await controller.exclude();
+
+    expect(writer.writeReviewFlag).toHaveBeenCalledWith(
+      first,
+      "excludedFromReview",
+    );
+    expect(writer.writeReview).not.toHaveBeenCalled();
+    expect(controller.session.items[0]?.outcome.type).toBe("excluded");
+    expect(getCurrentTune(controller.session)).toBe(second);
+  });
+
+  it("writes a session-maintained flag before advancing a live session", async () => {
+    const first = tune("one");
+    const second = tune("two");
+    const writer = reviewWriter();
+    const controller = new ReviewSessionController(
+      [first, second],
+      "live",
+      clock,
+      writer,
+    );
+
+    await controller.markSessionMaintained();
+
+    expect(writer.writeReviewFlag).toHaveBeenCalledWith(
+      first,
+      "sessionMaintained",
+    );
+    expect(writer.writeReview).not.toHaveBeenCalled();
+    expect(controller.session.items[0]?.outcome.type).toBe(
+      "session-maintained",
+    );
+    expect(getCurrentTune(controller.session)).toBe(second);
+  });
+
+  it("does not advance when a live flag write fails", async () => {
+    const writer = reviewWriter();
+    writer.writeReviewFlag.mockRejectedValue(new Error("flag write failed"));
+    const controller = new ReviewSessionController(
+      [tune("one"), tune("two")],
+      "live",
+      clock,
+      writer,
+    );
+
+    await expect(controller.exclude()).rejects.toThrow("flag write failed");
+    expect(getCurrentTune(controller.session)?.id).toBe("one");
+    expect(controller.session.items[0]?.outcome.type).toBe("pending");
+  });
+
+  it("never calls the writer in dry-run mode", async () => {
+    const writer = reviewWriter();
+    const first = frozenTune("one");
+    const second = frozenTune("two");
+    const third = frozenTune("three");
+    const fourth = frozenTune("four");
+    const controller = new ReviewSessionController(
+      [first, second, third, fourth],
       "dry-run",
       clock,
       writer,
@@ -96,15 +158,20 @@ describe("review session controller", () => {
 
     await controller.score(5);
     controller.skip();
+    await controller.exclude();
+    await controller.markSessionMaintained();
     controller.end();
 
     expect(writer.writeReview).not.toHaveBeenCalled();
+    expect(writer.writeReviewFlag).not.toHaveBeenCalled();
     expect(first.review.state).toBeUndefined();
     expect(second.review.state).toBeUndefined();
+    expect(third.review.state).toBeUndefined();
+    expect(fourth.review.state).toBeUndefined();
   });
 
   it("skip and end never write in live mode", () => {
-    const writer = { writeReview: vi.fn().mockResolvedValue(undefined) };
+    const writer = reviewWriter();
     const controller = new ReviewSessionController(
       [tune("one"), tune("two")],
       "live",
@@ -116,6 +183,7 @@ describe("review session controller", () => {
     controller.end();
 
     expect(writer.writeReview).not.toHaveBeenCalled();
+    expect(writer.writeReviewFlag).not.toHaveBeenCalled();
     expect(controller.session.items[1]?.outcome.type).toBe("pending");
   });
 
@@ -125,6 +193,13 @@ describe("review session controller", () => {
     ).toThrow("Live review session requires a review writer.");
   });
 });
+
+function reviewWriter() {
+  return {
+    writeReview: vi.fn().mockResolvedValue(undefined),
+    writeReviewFlag: vi.fn().mockResolvedValue(undefined),
+  };
+}
 
 function tune(id: string): Tune {
   return {

@@ -2,7 +2,9 @@ import type { ReviewMode } from "../domain/review-mode";
 import {
   createReviewSession,
   endReviewSession,
+  excludeCurrentTune,
   getCurrentTune,
+  markCurrentTuneSessionMaintained,
   scoreCurrentTune,
   skipCurrentTune,
   type ReviewSession,
@@ -52,7 +54,38 @@ export class ReviewSessionController {
     this.currentSession = skipCurrentTune(this.currentSession);
   }
 
+  async exclude(): Promise<void> {
+    const nextSession = excludeCurrentTune(this.currentSession);
+
+    if (this.mode === "live") {
+      await this.writeCurrentTuneFlag("excludedFromReview");
+    }
+
+    this.currentSession = nextSession;
+  }
+
+  async markSessionMaintained(): Promise<void> {
+    const nextSession = markCurrentTuneSessionMaintained(this.currentSession);
+
+    if (this.mode === "live") {
+      await this.writeCurrentTuneFlag("sessionMaintained");
+    }
+
+    this.currentSession = nextSession;
+  }
+
   end(): void {
     this.currentSession = endReviewSession(this.currentSession);
+  }
+
+  private async writeCurrentTuneFlag(
+    flag: "excludedFromReview" | "sessionMaintained",
+  ): Promise<void> {
+    const tune = getCurrentTune(this.currentSession);
+    if (tune === undefined || this.writer === undefined) {
+      throw new Error("Live review session has no writable current tune.");
+    }
+
+    await this.writer.writeReviewFlag(tune, flag);
   }
 }

@@ -38,7 +38,9 @@
   box-shadow: 0 0 0 1px var(--interactive-accent);
 }
 
+.folk-tune-review-queue-item.is-excluded,
 .folk-tune-review-queue-item.is-scored,
+.folk-tune-review-queue-item.is-session-maintained,
 .folk-tune-review-queue-item.is-skipped {
   opacity: 0.75;
 }
