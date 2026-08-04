@@ -41,6 +41,7 @@ Required coverage areas:
 - due/overdue classification;
 - top-up selection;
 - queue ordering;
+- queue ordering with and without never-reviewed prioritisation;
 - stats calculation;
 - initialization planning;
 - validation rules.
@@ -56,6 +57,9 @@ Required coverage areas:
 - complete review item in dry run mode;
 - ensure dry run does not call writer;
 - skip item does not write;
+- current-note review validates tune folder and eligibility;
+- current-note review writes the same review state as queue review;
+- excluded/session-maintained flag actions write only the intended flag;
 - end session leaves unreviewed items unchanged;
 - stats use case does not write;
 - initialization preview does not write;
@@ -72,6 +76,7 @@ Testable pieces:
 - frontmatter object to domain tune mapping;
 - domain review state to frontmatter mutation;
 - settings default merging;
+- `dev/test mode` and never-reviewed prioritisation default merging;
 - seed plan to vault operations;
 - path normalization using Obsidian-style vault paths.
 
@@ -126,6 +131,38 @@ Queue tests should cover:
 - session-maintained exclusion/inclusion;
 - excluded tune exclusion/inclusion;
 - deterministic ordering when randomization is disabled.
+- default priority: due/overdue, never reviewed, not due;
+- never-reviewed priority: never reviewed, due/overdue, not due.
+
+## Current-note review test requirements
+
+Current-note review tests should prove:
+
+- notes outside the configured tune folder cannot be reviewed;
+- excluded tunes cannot be reviewed directly;
+- session-maintained tunes cannot be reviewed directly;
+- malformed tune metadata prevents direct review;
+- eligible active tune notes can be scored;
+- successful live writes close the review UI and show an Obsidian notification.
+
+## Review flag action test requirements
+
+Review flag action tests should prove:
+
+- `exclude from reviews` writes `review.excludedFromReview`;
+- `mark as session maintained` writes `review.sessionMaintained`;
+- neither action writes score/date metadata unless a score is selected;
+- dry run does not persist either flag.
+
+## Settings/UI visibility test requirements
+
+Settings/UI tests should prove:
+
+- default tune folder is `Repertoire/Tunes`;
+- `dev/test mode` defaults to false;
+- the review mode control is hidden when `dev/test mode` is false;
+- the review mode control is visible and last when `dev/test mode` is true;
+- `Prioritise never-reviewed tunes` defaults to false.
 
 ## Stats test requirements
 

@@ -18,6 +18,7 @@ In the command palette these can be represented as named commands such as:
 
 ```text
 Folk Tune Review: Start review
+Folk Tune Review: Add review to current tune
 Folk Tune Review: Open stats
 Folk Tune Review: Admin - Initialize vault
 Folk Tune Review: Admin - Validate vault
@@ -50,13 +51,45 @@ Likely review options:
 
 - number of tunes (defaults to 10);
 - optional filters (origin, session, etc.);
-- live or dry run mode.
 - include/exclude session-maintained tunes;
 - include/exclude excluded tunes;
+- prioritise never-reviewed tunes;
+- live or dry run mode.
+
+The live/dry-run review mode option is intended for the author and testers. It
+must remain available, but should only be visible when the plugin setting
+`dev/test mode` is enabled. When visible, it should be the last option in the
+review setup screen. The setting defaults to false and should be shown as the
+bottom setting in the plugin settings tab.
 
 ## Dry run command behaviour
 
 Dry run means the review session can be run normally, but no tune metadata is written back to the vault.
+
+## Current tune review command behaviour
+
+The `Folk Tune Review: Add review to current tune` command should review the
+currently active note directly, bypassing automated queue selection.
+
+This is the Obsidian-native replacement for the old CLI option:
+
+```csharp
+[CommandOption("--tune <NAME_OR_ID>")]
+[Description("Review a specific tune by its title or ID, bypassing automated selection logic")]
+public string? Tune { get; set; }
+```
+
+The command should:
+
+1. validate that the active note is inside the configured tune folder;
+2. validate that the tune would otherwise be eligible for review selection;
+3. open the same single-tune review UI used during a normal queue session;
+4. write the selected score to the active tune note's frontmatter in live mode;
+5. close the dialog after a successful write;
+6. show a native Obsidian notification confirming that the note was updated.
+
+If the current note is outside the tune folder or would be excluded from queue
+selection, the command should not allow an individual review.
 
 ## Stats command behaviour
 

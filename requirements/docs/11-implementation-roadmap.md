@@ -102,6 +102,32 @@ Goals:
 - Create and populate public user documentation
 - Create initial README.md summary for Obsidian community consumption, with an overt reference to more extensive documentation.
 
+## Pre-beta alpha feedback
+
+Goals:
+
+- change the default tune folder from `Tunes/Tune`/`Tunes/Tunes` to `Repertoire/Tunes`;
+- add a bottom-of-settings `dev/test mode` flag, defaulting to false;
+- keep live/dry-run review mode functionality, but hide the review setup control unless `dev/test mode` is enabled;
+- move the live/dry-run review mode control to the end of the review setup screen when visible;
+- add `Folk Tune Review: Add review to current tune`;
+- validate current-note review using the configured tune folder and the same eligibility rules used by queue selection;
+- reuse the normal current-tune review screen for current-note review;
+- close the current-note review dialog after a successful live write and show a native Obsidian notification;
+- add review UI actions to set `review.excludedFromReview` and `review.sessionMaintained`;
+- add a review setup option `Prioritise never-reviewed tunes`, defaulting to false;
+- when `Prioritise never-reviewed tunes` is false, keep existing selection priority: due for review, never reviewed, not due for review;
+- when `Prioritise never-reviewed tunes` is true, use: never reviewed, due for review, not due for review.
+
+Acceptance criteria:
+
+- new defaults are reflected in settings, initialization, and tests;
+- non-dev users do not see live/dry-run mode in review setup;
+- current-note review writes the same review metadata as a queue review;
+- ineligible active notes cannot be reviewed directly;
+- exclusion and session-maintained actions are available in the review UI and are persisted in live mode;
+- queue selection tests cover both prioritisation modes.
+
 
 ## Phase 5: Stats
 

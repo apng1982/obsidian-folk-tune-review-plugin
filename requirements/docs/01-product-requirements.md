@@ -96,13 +96,16 @@ A useful MVP must:
 - install as an Obsidian plugin;
 - have `isDesktopOnly: false` in `manifest.json`;
 - run without Node/Electron-only APIs;
+- default the configured tune folder to `Repertoire/Tunes`;
 - scan the configured tune folder;
 - read tune metadata from frontmatter/cache;
 - build a review queue;
 - show all selected tunes before and during review;
+- allow the current tune note to be reviewed directly when it is eligible;
 - show score buttons with interval days clearly visible;
 - support dry run mode with no writes;
 - support live mode writing latest review metadata to tune notes;
+- allow users to mark tunes as excluded from review or session-maintained from the review UI;
 - run offline;
 - have comprehensive domain unit tests;
 - have adapter/application tests using fake Obsidian boundaries.

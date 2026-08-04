@@ -22,17 +22,30 @@ be redesigned during the re-code without an explicit decision.
 
 - A tune is learned and eligible only when its `learn` frontmatter value is
   `false` or missing. Missing `learn` metadata is treated as learned.
-- Selection follows the existing CLI logic:
+- Selection follows the existing CLI logic by default:
   1. due and overdue tunes with review history, ordered by most overdue;
   2. never-reviewed tunes, randomized;
   3. non-due top-up tunes, randomized.
+- Review setup includes `Prioritise never-reviewed tunes`, default false. When
+  enabled, selection should order never-reviewed tunes first, then due/overdue
+  tunes, then non-due top-up tunes.
 - Due today counts as overdue for selection purposes.
 - Malformed frontmatter or malformed review metadata excludes a tune from
   selection. Validation should report the problem separately.
 - A partial `review` object may contain `sessionMaintained` and
   `excludedFromReview` without post-review state fields.
 - The configured tune folder is flat and is not scanned recursively.
-- The default tune folder is `[root]/Tunes/Tunes`.
+- The default tune folder is `Repertoire/Tunes`.
+- Add a plugin setting named `dev/test mode`, default false, as the bottom
+  setting. The live/dry-run review mode control remains supported but is hidden
+  in review setup unless `dev/test mode` is enabled; when visible, it appears
+  last.
+- Add `Folk Tune Review: Add review to current tune`, equivalent to the old CLI
+  `--tune <NAME_OR_ID>` use case but based on the active Obsidian note. The
+  active note must be in the configured tune folder and pass the same eligibility
+  checks used for queue selection.
+- Review UI should expose actions to set `review.excludedFromReview` and
+  `review.sessionMaintained`.
 - Origin filtering follows the existing CLI's case-insensitive displayed-text
   matching, including Obsidian wikilinks and aliases.
 - The initial review session UI will use an Obsidian `ItemView`.

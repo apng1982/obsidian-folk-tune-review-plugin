@@ -22,9 +22,14 @@ The setup screen should allow the user to choose:
 - number of tunes (default to 10);
 - whether to include session-maintained tunes;
 - whether to include excluded tunes;
+- whether to prioritise never-reviewed tunes;
 - live mode (default) or dry run mode.
 
 Defaults should be configurable in plugin settings (this can be post-MVP).
+
+The live/dry-run review mode control should be hidden by default. It is only
+visible when the plugin setting `dev/test mode` is enabled, and when visible it
+should be the last control in the setup screen.
 
 ## Review queue preview
 
@@ -50,9 +55,18 @@ The session should show:
 - an `Open note` action (without losing the context of the review);
 - large touch-friendly score buttons;
 - the interval days for every score;
-- skip/end controls.
+- skip/end controls;
+- actions to exclude the current tune from reviews and to mark it as session-maintained.
 
 No free-text review notes field should be included.
+
+When the user chooses `exclude from reviews`, the plugin should set
+`review.excludedFromReview` on the tune note and advance the review session
+without writing score/date metadata. When the user chooses `mark as session
+maintained`, the plugin should set `review.sessionMaintained` on the tune note
+and advance the review session without writing score/date metadata. These
+actions should be unavailable or no-op in dry-run mode except for showing the
+same user flow without persisting changes.
 
 ## Score-to-interval mapping
 
@@ -134,6 +148,27 @@ The user should be able to skip a tune without writing metadata.
 
 Skipped tunes should remain unchanged in both live and dry run modes.
 
+## Current tune review
+
+The user should be able to navigate to a tune note and run:
+
+```text
+Folk Tune Review: Add review to current tune
+```
+
+This command bypasses automated queue construction but must reuse the same tune
+eligibility rules as queue selection. The active note can be reviewed only when:
+
+- it is inside the configured tune folder;
+- it can be parsed as a tune;
+- it is learned/eligible according to the normal review rules;
+- it is not excluded from reviews;
+- it is not marked as session-maintained.
+
+The command should show the same current-tune review screen used during a
+review queue. After a successful live write, the dialog should close and a
+native Obsidian notification should confirm that the note was updated.
+
 ## End session behaviour
 
 The user should be able to end a session before completing the queue.
@@ -155,6 +190,13 @@ The current CLI behaviour is a useful reference:
 - overdue/due tunes should be prioritised;
 - never-reviewed tunes are included;
 - top-up tunes may be used to reach the requested count.
+
+The review setup option `Prioritise never-reviewed tunes` changes the primary
+ordering:
+
+- when false, use the existing ordering: due for review, then never reviewed,
+  then not due for review;
+- when true, use: never reviewed, then due for review, then not due for review.
 
 Exact ordering should be specified in tests.
 
@@ -183,8 +225,11 @@ The review workflow is acceptable when:
 - all selected tunes remain accessible during review;
 - score buttons show interval days;
 - navigating to a tune note opens it without losing the context of the review;
+- the current active tune note can be reviewed directly when eligible;
 - dry run can be completed with no writes;
 - live review updates only the latest review metadata;
+- live review can set `review.excludedFromReview` and `review.sessionMaintained`
+  from the review UI;
 - no notes/comments UI exists;
 - no review history is written;
 - the workflow is usable on mobile touch screens;

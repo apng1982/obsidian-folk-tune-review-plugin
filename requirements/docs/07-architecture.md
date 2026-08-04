@@ -89,7 +89,9 @@ The application layer coordinates use cases through ports/interfaces.
 Example use cases:
 
 - build review session;
+- review current tune;
 - complete one review item;
+- update review flags for one tune;
 - calculate stats;
 - build initialization plan;
 - apply initialization plan;
@@ -172,6 +174,8 @@ export interface PluginSettings {
   defaultReviewCount: number;
   includeSessionMaintainedByDefault: boolean;
   includeExcludedByDefault: boolean;
+  prioritiseNeverReviewedTunesByDefault: boolean;
+  devTestMode: boolean;
 }
 ```
 

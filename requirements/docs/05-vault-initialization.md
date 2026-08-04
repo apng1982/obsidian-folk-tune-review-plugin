@@ -51,10 +51,10 @@ The exact structure can be configurable, but a default generated vault could loo
 
 ```text
 Root/
-  Tunes/
-  Tunes/Tunes/
-  Tunes/Sets
-  Tunes/Dots
+  Repertoire/
+  Repertoire/Tunes/
+  Repertoire/Sets
+  Repertoire/Dots
   Ref/
   Ref/Composer/
   Ref/Geo/
@@ -71,15 +71,16 @@ Do not deeply hard-code the author’s personal vault paths.
 Suggested settings:
 
 ```yaml
-rootFolder: Folk Tunes
-tuneFolder: Folk Tunes/Tunes
-originFolder: Folk Tunes/Geo
-keyFolder: Folk Tunes/Keys
-modeFolder: Folk Tunes/Modes
-typeFolder: Folk Tunes/Types
+rootFolder: Repertoire
+tuneFolder: Repertoire/Tunes
+originFolder: Ref/Geo
+keyFolder: Ref/Keys
+modeFolder: Ref/Modes
+typeFolder: Ref/Types
 ```
 
-The defaults should match the plugin’s recommended structure, but users should be able to adapt existing vaults.
+The default tune folder should be `Repertoire/Tunes`. Users should be able to
+adapt existing vaults by changing the path in plugin settings.
 
 ## Seed data
 

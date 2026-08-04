@@ -38,6 +38,7 @@ Likely command palette entries:
 
 ```text
 Folk Tune Review: Start review
+Folk Tune Review: Add review to current tune
 Folk Tune Review: Open stats
 Folk Tune Review: Initialize vault
 Folk Tune Review: Validate vault
@@ -54,6 +55,11 @@ build queue → preview queue → run session → optionally write latest review
 The user must see all selected tunes before/during review.
 
 The old CLI `pick` command does not exist. Its useful behaviour is absorbed into the queue preview.
+
+The current active tune note can also be reviewed directly with
+`Folk Tune Review: Add review to current tune`. This command bypasses queue
+construction but must enforce the same tune folder and eligibility rules as
+normal selection.
 
 ## Score mapping
 
@@ -99,6 +105,22 @@ Do not write notes/comments/history.
 Dry run writes nothing back to the vault.
 
 It should still allow queue preview, opening notes, scoring, skipping, and completing the session.
+
+The live/dry-run option is hidden from normal users. Add a plugin setting named
+`dev/test mode`, default false, shown at the bottom of settings. Only show the
+review mode control in the review setup screen when that setting is enabled,
+and place it last when visible.
+
+## Pre-beta alpha feedback
+
+- Default tune folder: `Repertoire/Tunes`.
+- Review setup includes `Prioritise never-reviewed tunes`, default false.
+- Default queue order remains due for review, then never reviewed, then not due.
+- With prioritisation enabled, queue order is never reviewed, then due for
+  review, then not due.
+- Review UI includes actions for `exclude from reviews` and `mark as session
+  maintained`, writing `review.excludedFromReview` and
+  `review.sessionMaintained` respectively in live mode.
 
 ## Architecture
 

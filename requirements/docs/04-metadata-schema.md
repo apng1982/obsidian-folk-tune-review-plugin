@@ -32,6 +32,8 @@ Fields:
 | `review.score`        | integer `0..9`            | after first review | Score selected in the review UI.      |
 | `review.intervalDays` | integer                   | after first review | Number of days added for next review. |
 | `review.nextDue`      | date string, `YYYY-MM-DD` | after first review | Next due date.                        |
+| `review.sessionMaintained` | boolean              | optional           | Tune is maintained through sessions and normally omitted from review queues. |
+| `review.excludedFromReview` | boolean             | optional           | Tune should normally be omitted from review queues. |
 
 `review.nextDue` is derivable from `lastReviewed + intervalDays`, but should be stored because it makes stats, reports, sorting, and external queries easier.
 
@@ -133,6 +135,15 @@ The plugin owns:
 
 The plugin should avoid changing unrelated frontmatter fields.
 
+## Review flag updates
+
+The review UI should be able to set `review.excludedFromReview` and
+`review.sessionMaintained` without requiring the user to edit YAML manually.
+
+Setting either flag from a review session should not imply that the tune was
+scored. It should not write `lastReviewed`, `score`, `intervalDays`, or
+`nextDue` unless the user has explicitly chosen a score.
+
 ## Acceptance criteria
 
 The schema is acceptable when:
@@ -142,5 +153,6 @@ The schema is acceptable when:
 - no review history is required;
 - no review notes/comments are stored;
 - nested review metadata is supported;
+- exclusion and session-maintained flags can be written independently of scores;
 - stats can be calculated from metadata alone;
 - unit tests cover schema mapping and validation.
