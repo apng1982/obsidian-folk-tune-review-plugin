@@ -83,6 +83,7 @@ export default class FolkTuneReviewPlugin extends Plugin {
             includeSessionMaintained:
               this.settings.includeSessionMaintainedByDefault,
             mode: "live",
+            prioritiseNeverReviewed: false,
           },
           async (request) => this.buildAndShowQueue(request),
         ).open();

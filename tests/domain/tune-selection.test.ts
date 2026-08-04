@@ -77,6 +77,40 @@ describe("tune selection", () => {
     ]);
   });
 
+  it("keeps existing priority when never-reviewed prioritisation is false", () => {
+    const tunes = [
+      tune("due", { state: createReviewState(parseLocalDate("2025-12-01"), 2) }),
+      tune("never"),
+      tune("not-due", {
+        state: createReviewState(parseLocalDate("2025-12-30"), 9),
+      }),
+    ];
+
+    expect(
+      selectTunes(tunes, {
+        ...defaultOptions,
+        prioritiseNeverReviewed: false,
+      }).map(({ id }) => id),
+    ).toEqual(["due", "never", "not-due"]);
+  });
+
+  it("can prioritize never-reviewed tunes before due tunes", () => {
+    const tunes = [
+      tune("due", { state: createReviewState(parseLocalDate("2025-12-01"), 2) }),
+      tune("never"),
+      tune("not-due", {
+        state: createReviewState(parseLocalDate("2025-12-30"), 9),
+      }),
+    ];
+
+    expect(
+      selectTunes(tunes, {
+        ...defaultOptions,
+        prioritiseNeverReviewed: true,
+      }).map(({ id }) => id),
+    ).toEqual(["never", "due", "not-due"]);
+  });
+
   it("excludes only tunes explicitly marked learn true", () => {
     expect(
       selectTunes(

@@ -7,6 +7,7 @@ export interface TuneSelectionOptions {
   readonly includeExcluded: boolean;
   readonly includeSessionMaintained: boolean;
   readonly originFilter?: string;
+  readonly prioritiseNeverReviewed?: boolean;
   readonly randomize: boolean;
   readonly today: LocalDate;
 }
@@ -87,7 +88,12 @@ export function selectTunes(
     random,
   );
 
-  return [...due, ...neverReviewed, ...nonDue]
+  const prioritisedTunes =
+    options.prioritiseNeverReviewed === true
+      ? [...neverReviewed, ...due, ...nonDue]
+      : [...due, ...neverReviewed, ...nonDue];
+
+  return prioritisedTunes
     .slice(0, options.count)
     .map(({ tune }) => tune);
 }

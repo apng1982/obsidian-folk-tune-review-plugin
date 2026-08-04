@@ -9,6 +9,7 @@ export interface ReviewStartDefaults {
   readonly includeExcluded: boolean;
   readonly includeSessionMaintained: boolean;
   readonly mode: ReviewMode;
+  readonly prioritiseNeverReviewed: boolean;
 }
 
 export interface ReviewStartRequest {
@@ -23,6 +24,7 @@ export class ReviewStartModal extends Modal {
   private includeSessionMaintained: boolean;
   private mode: ReviewMode;
   private originFilter = "";
+  private prioritiseNeverReviewed: boolean;
 
   constructor(
     app: ConstructorParameters<typeof Modal>[0],
@@ -35,6 +37,7 @@ export class ReviewStartModal extends Modal {
     this.includeExcluded = defaults.includeExcluded;
     this.includeSessionMaintained = defaults.includeSessionMaintained;
     this.mode = defaults.mode;
+    this.prioritiseNeverReviewed = defaults.prioritiseNeverReviewed;
   }
 
   override onOpen(): void {
@@ -84,6 +87,15 @@ export class ReviewStartModal extends Modal {
         });
       });
 
+    new Setting(this.contentEl)
+      .setName("Prioritise never-reviewed tunes")
+      .setDesc("Prioritise tunes that have never been reviewed over tunes currently due for review.")
+      .addToggle((toggle) => {
+        toggle.setValue(this.prioritiseNeverReviewed).onChange((value) => {
+          this.prioritiseNeverReviewed = value;
+        });
+      });
+
     if (this.devTestMode) {
       new Setting(this.contentEl)
         .setName("Review mode")
@@ -128,6 +140,7 @@ export class ReviewStartModal extends Modal {
         includeExcluded: this.includeExcluded,
         includeSessionMaintained: this.includeSessionMaintained,
         originFilter: this.originFilter.trim() || undefined,
+        prioritiseNeverReviewed: this.prioritiseNeverReviewed,
         randomize: true,
       },
     });
