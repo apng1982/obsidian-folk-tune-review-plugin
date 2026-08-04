@@ -92,7 +92,6 @@ Useful fixture cases:
 - vault with excluded/session-maintained tunes;
 - vault with mixed origins;
 - vault with invalid review metadata;
-- vault with duplicate IDs.
 
 Later, consider Obsidian-specific E2E tooling if the plugin matures.
 
@@ -139,8 +138,9 @@ Queue tests should cover:
 Current-note review tests should prove:
 
 - notes outside the configured tune folder cannot be reviewed;
-- excluded tunes cannot be reviewed directly;
-- session-maintained tunes cannot be reviewed directly;
+- current-note review requires `learn: false`;
+- excluded tunes can be reviewed directly;
+- session-maintained tunes can be reviewed directly;
 - malformed tune metadata prevents direct review;
 - eligible active tune notes can be scored;
 - successful live writes close the review UI and show an Obsidian notification.
@@ -190,8 +190,6 @@ Initialization tests should cover:
 - seed notes are not overwritten by default;
 - missing folder creation;
 - missing template creation;
-- missing IDs;
-- duplicate IDs;
 - apply plan calls the expected writer operations.
 
 ## CI requirements

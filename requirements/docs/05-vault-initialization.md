@@ -19,7 +19,7 @@ Suggested flow:
 1. Choose or confirm root folder.
 2. Preview folders and seed notes to create.
 3. Preview tune template(s) to create.
-4. Preview missing metadata or IDs to add, if enabled.
+4. Preview missing metadata to add, if enabled.
 5. Apply changes only after explicit confirmation.
 6. Show a summary.
 
@@ -168,16 +168,6 @@ sets: []
 learn: true 
 sessions: []
 collections: []
-id: <%*
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-tR += uuidv4();
-%>
 created: <% tp.date.now("YYYY-MM-DD") %>
 ---
 
@@ -192,8 +182,6 @@ Initialize and/or Validate should be able to report:
 
 - missing required folders;
 - missing seed categories;
-- missing tune IDs;
-- duplicate tune IDs;
 - invalid review scores;
 - invalid review dates;
 - review metadata where `nextDue` does not match `lastReviewed + intervalDays`;
@@ -201,19 +189,6 @@ Initialize and/or Validate should be able to report:
 - unknown or malformed origin links, if enforced.
 
 Validation should be read-only unless the user explicitly asks to apply fixes.
-
-## ID initialization
-
-The plugin may include an action to add missing tune IDs.
-
-This should be previewed before write.
-
-Potential rules:
-
-- add IDs only to notes recognized as tune notes;
-- do not change existing IDs unless duplicate resolution is explicitly requested;
-- generate UUIDs;
-- write through the frontmatter writer adapter.
 
 ## Acceptance criteria
 

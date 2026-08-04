@@ -120,8 +120,8 @@ describe("tune selection", () => {
     ).toEqual(["missing", "false"]);
   });
 
-  it("excludes tunes without an ID", () => {
-    expect(selectTunes([tune(undefined), tune("included")], defaultOptions)).toHaveLength(1);
+  it("does not require tune IDs for selection", () => {
+    expect(selectTunes([tune(undefined), tune("included")], defaultOptions)).toHaveLength(2);
   });
 
   it("applies excluded and session-maintained options", () => {
@@ -188,9 +188,9 @@ describe("tune selection", () => {
 });
 
 describe("tune selection eligibility", () => {
-  it("accepts learned tunes with IDs and no review flags", () => {
+  it("accepts learned tunes without requiring IDs", () => {
     expect(
-      isTuneEligibleForSelection(tune("one"), {
+      isTuneEligibleForSelection(tune(undefined), {
         includeExcluded: false,
         includeSessionMaintained: false,
       }),
@@ -203,7 +203,6 @@ describe("tune selection eligibility", () => {
       includeSessionMaintained: false,
     };
 
-    expect(isTuneEligibleForSelection(tune(undefined), options)).toBe(false);
     expect(isTuneEligibleForSelection(tune("learning", {}, "Learning", true), options)).toBe(
       false,
     );

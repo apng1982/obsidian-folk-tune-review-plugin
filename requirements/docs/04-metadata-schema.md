@@ -39,7 +39,14 @@ Fields:
 
 ## Tune metadata
 
-The exact tune metadata schema can evolve, but the plugin needs enough information to determine review eligibility and filtering.
+The exact tune metadata schema can evolve, but the plugin needs enough
+information to determine review eligibility and filtering.
+
+Tune notes do not require a GUID or frontmatter ID. The note's vault path,
+including its file name within the configured flat tune folder, is sufficient
+identity because review state is stored inside the note itself. Existing `id`
+fields from older vaults may be preserved, but they must not be required for
+selection, direct review, initialization, or validation.
 
 Suggested shape:
 
@@ -59,7 +66,6 @@ learn: false
 learned: 2026-06-05
 sessions: []
 collections: []
-id: 0e091387-4207-4cd4-98a1-33e380a3dd5c
 created: 2026-04-27
 review:
   lastReviewed: 2026-06-05
@@ -73,7 +79,6 @@ review:
 
 Potentially required fields for mature validation:
 
-- `id`;
 - tune kind/type marker;
 - learned flag;
 - origin(s), if origin filtering is enabled;
@@ -131,7 +136,6 @@ The plugin owns:
 
 - `review.*` fields;
 - any plugin-specific schema/version marker it creates;
-- any generated IDs, if the user asks Initialize/Validate to add missing IDs.
 
 The plugin should avoid changing unrelated frontmatter fields.
 

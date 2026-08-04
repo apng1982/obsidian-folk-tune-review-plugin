@@ -71,25 +71,27 @@ Dry run means the review session can be run normally, but no tune metadata is wr
 The `Folk Tune Review: Add review to current tune` command should review the
 currently active note directly, bypassing automated queue selection.
 
-This is the Obsidian-native replacement for the old CLI option:
+This is the Obsidian-native replacement for the old CLI option, but without
+requiring an ID-based lookup:
 
 ```csharp
-[CommandOption("--tune <NAME_OR_ID>")]
-[Description("Review a specific tune by its title or ID, bypassing automated selection logic")]
+[CommandOption("--tune <NAME>")]
+[Description("Review a specific tune by its title, bypassing automated selection logic")]
 public string? Tune { get; set; }
 ```
 
 The command should:
 
 1. validate that the active note is inside the configured tune folder;
-2. validate that the tune would otherwise be eligible for review selection;
+2. validate that the tune is marked as learned;
 3. open the same single-tune review UI used during a normal queue session;
 4. write the selected score to the active tune note's frontmatter in live mode;
 5. close the dialog after a successful write;
 6. show a native Obsidian notification confirming that the note was updated.
 
-If the current note is outside the tune folder or would be excluded from queue
-selection, the command should not allow an individual review.
+If the current note is outside the tune folder, cannot be parsed as a tune, or
+is not marked as learned, the command should not allow an individual review.
+Excluded and session-maintained tunes can still be reviewed directly.
 
 ## Stats command behaviour
 
@@ -123,10 +125,9 @@ While initially, only the Initialize and Validate commands will be part of the A
 it is expected that more commands will be added in the future for advanced vault management and maintenance.
 
 Example future commands are:
-- `Admin - Validate IDs` - check that every tune note has a unique ID, and add if missing.
 - `Admin - Add metadata` - adds a new yaml field to every tune note
 - `Admin - Remove metadata` - deletes an existing yaml field from every tune note
-- `Admin - Update metadata` - updates an existing yaml field in every tune note (e.g. potentially from a file of tune IDs)
+- `Admin - Update metadata` - updates an existing yaml field in every tune note
 
 ## Commands that should not exist
 

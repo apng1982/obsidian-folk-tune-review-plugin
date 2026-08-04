@@ -47,7 +47,7 @@ export function validateCurrentTuneReviewCandidate(
     };
   }
 
-  if (tune.learn !== false || tune.id === undefined || tune.id.length === 0) {
+  if (tune.learn !== false) {
     return {
       reason: "ineligible-tune",
       type: "invalid",

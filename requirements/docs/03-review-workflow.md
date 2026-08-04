@@ -161,9 +161,11 @@ eligibility rules as queue selection. The active note can be reviewed only when:
 
 - it is inside the configured tune folder;
 - it can be parsed as a tune;
-- it is learned/eligible according to the normal review rules;
-- it is not excluded from reviews;
-- it is not marked as session-maintained.
+- it is marked as learned with `learn: false`.
+
+Unlike queue selection, current-tune review ignores
+`review.excludedFromReview` and `review.sessionMaintained`; this command is
+also the UI for toggling those flags without editing YAML manually.
 
 The command should show the same current-tune review screen used during a
 review queue. After a successful live write, the dialog should close and a
@@ -184,6 +186,8 @@ The detailed queue selection logic should be implemented in the domain layer and
 The current CLI behaviour is a useful reference:
 
 - learned tunes are candidates;
+- tune note file names are sufficient identity for selection; no GUID or
+  frontmatter ID is required;
 - excluded tunes are omitted unless explicitly included;
 - session-maintained tunes are omitted unless explicitly included;
 - origin filter can restrict candidates;

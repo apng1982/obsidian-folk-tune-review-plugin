@@ -22,6 +22,9 @@ be redesigned during the re-code without an explicit decision.
 
 - A tune is learned and eligible only when its `learn` frontmatter value is
   `false` or missing. Missing `learn` metadata is treated as learned.
+- Tune notes do not require a GUID or frontmatter ID. The note path/file name in
+  the configured flat tune folder is sufficient identity because review state is
+  stored inside the note.
 - Selection follows the existing CLI logic by default:
   1. due and overdue tunes with review history, ordered by most overdue;
   2. never-reviewed tunes, randomized;
@@ -41,9 +44,10 @@ be redesigned during the re-code without an explicit decision.
   in review setup unless `dev/test mode` is enabled; when visible, it appears
   last.
 - Add `Folk Tune Review: Add review to current tune`, equivalent to the old CLI
-  `--tune <NAME_OR_ID>` use case but based on the active Obsidian note. The
-  active note must be in the configured tune folder and pass the same eligibility
-  checks used for queue selection.
+  `--tune <NAME>` use case but based on the active Obsidian note. The active
+  note must be in the configured tune folder, parse as a tune, and have
+  `learn: false`. Excluded and session-maintained flags do not block direct
+  review.
 - Review UI should expose actions to set `review.excludedFromReview` and
   `review.sessionMaintained`.
 - Origin filtering follows the existing CLI's case-insensitive displayed-text

@@ -102,7 +102,7 @@ export function isTuneEligibleForSelection(
   tune: Tune,
   options: TuneEligibilityOptions,
 ): boolean {
-  if (!isLearnedTune(tune) || tune.id === undefined || tune.id.length === 0) {
+  if (!isLearnedTune(tune)) {
     return false;
   }
 

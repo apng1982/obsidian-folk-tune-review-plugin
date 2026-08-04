@@ -109,7 +109,7 @@ export interface TuneRepository {
 }
 
 export interface ReviewWriter {
-  writeReview(tuneId: string, review: ReviewState): Promise<void>;
+  writeReview(tune: Tune, review: ReviewState): Promise<void>;
 }
 
 export interface NoteOpener {

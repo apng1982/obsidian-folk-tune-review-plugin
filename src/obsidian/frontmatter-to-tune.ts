@@ -23,7 +23,7 @@ export function mapFrontmatterToTune(
   try {
     return {
       composer: readOptionalDisplayText(frontmatter.composer),
-      id: readOptionalString(frontmatter.id),
+      id: readOptionalLegacyId(frontmatter.id),
       keys: readDisplayTextList(frontmatter.key),
       learn: readOptionalBoolean(frontmatter.learn),
       origin: readOptionalDisplayText(frontmatter.origin),
@@ -141,6 +141,10 @@ function readOptionalString(value: unknown): string | undefined {
   }
 
   return readString(value);
+}
+
+function readOptionalLegacyId(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
 }
 
 function readOptionalBoolean(value: unknown): boolean | undefined {

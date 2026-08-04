@@ -58,8 +58,9 @@ The old CLI `pick` command does not exist. Its useful behaviour is absorbed into
 
 The current active tune note can also be reviewed directly with
 `Folk Tune Review: Add review to current tune`. This command bypasses queue
-construction but must enforce the same tune folder and eligibility rules as
-normal selection.
+construction but must enforce the configured tune folder, parseable tune
+metadata, and `learn: false`. Excluded and session-maintained flags do not block
+direct review.
 
 ## Score mapping
 

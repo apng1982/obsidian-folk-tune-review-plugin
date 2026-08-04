@@ -52,7 +52,7 @@ describe("current tune review candidate validation", () => {
     });
   });
 
-  it("rejects tunes that are not marked as learned or do not have an ID", () => {
+  it("rejects tunes that are not marked as learned", () => {
     expect(
       validateCurrentTuneReviewCandidate(
         file("Repertoire/Tunes/Learning.md", { id: "learning", learn: true }),
@@ -66,16 +66,6 @@ describe("current tune review candidate validation", () => {
     expect(
       validateCurrentTuneReviewCandidate(
         file("Repertoire/Tunes/Missing Learn.md", { id: "missing-learn" }),
-        tuneFolder,
-      ),
-    ).toEqual({
-      reason: "ineligible-tune",
-      type: "invalid",
-    });
-
-    expect(
-      validateCurrentTuneReviewCandidate(
-        file("Repertoire/Tunes/Missing ID.md", { learn: false }),
         tuneFolder,
       ),
     ).toEqual({
@@ -113,7 +103,6 @@ describe("current tune review candidate validation", () => {
     expect(
       validateCurrentTuneReviewCandidate(
         file("Repertoire/Tunes/The Silver Spear.md", {
-          id: "silver-spear",
           key: ["D", "G"],
           learn: false,
           origin: "[[Ref/Geo/Irish|Irish]]",
@@ -122,7 +111,6 @@ describe("current tune review candidate validation", () => {
       ),
     ).toMatchObject({
       tune: {
-        id: "silver-spear",
         keys: ["D", "G"],
         learn: false,
         origin: "Irish",
@@ -140,7 +128,7 @@ describe("current tune review candidate validation", () => {
 
 function file(
   path: string,
-  frontmatter: unknown = { id: "one", learn: false },
+  frontmatter: unknown = { learn: false },
 ): CurrentTuneReviewFile {
   const parts = path.split("/");
   const filename = parts[parts.length - 1] ?? path;

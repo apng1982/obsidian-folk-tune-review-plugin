@@ -111,7 +111,7 @@ Goals:
 - keep live/dry-run review mode functionality, but hide the review setup control unless `dev/test mode` is enabled;
 - move the live/dry-run review mode control to the end of the review setup screen when visible;
 - add `Folk Tune Review: Add review to current tune`;
-- validate current-note review using the configured tune folder and the same eligibility rules used by queue selection;
+- validate current-note review using the configured tune folder, parseable tune metadata, and `learn: false`;
 - reuse the normal current-tune review screen for current-note review;
 - close the current-note review dialog after a successful live write and show a native Obsidian notification;
 - add review UI actions to set `review.excludedFromReview` and `review.sessionMaintained`;
@@ -124,7 +124,8 @@ Acceptance criteria:
 - new defaults are reflected in settings, initialization, and tests;
 - non-dev users do not see live/dry-run mode in review setup;
 - current-note review writes the same review metadata as a queue review;
-- ineligible active notes cannot be reviewed directly;
+- active notes outside the tune folder, malformed tune notes, and unlearned
+  tunes cannot be reviewed directly;
 - exclusion and session-maintained actions are available in the review UI and are persisted in live mode;
 - queue selection tests cover both prioritisation modes.
 

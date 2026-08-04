@@ -79,6 +79,20 @@ describe("frontmatter to tune mapping", () => {
     });
   });
 
+  it("ignores malformed legacy tune IDs", () => {
+    expect(
+      mapFrontmatterToTune(file, {
+        id: 123,
+        learn: false,
+      }),
+    ).toMatchObject({
+      id: undefined,
+      learn: false,
+      path: file.path,
+      title: file.title,
+    });
+  });
+
   it.each([
     undefined,
     "not frontmatter",
