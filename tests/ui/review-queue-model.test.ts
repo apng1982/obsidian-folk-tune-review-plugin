@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildCurrentTuneFlagActionModels,
   buildReviewQueueItemModel,
   buildScoreIntervalModels,
 } from "../../src/ui/review-queue-model";
@@ -45,4 +46,54 @@ describe("review queue preview model", () => {
       score: 9,
     });
   });
+
+  it("builds set-flag actions for an unflagged current tune", () => {
+    expect(buildCurrentTuneFlagActionModels(tune())).toEqual([
+      {
+        flag: "excludedFromReview",
+        label: "Exclude from reviews",
+        value: true,
+      },
+      {
+        flag: "sessionMaintained",
+        label: "Mark as session maintained",
+        value: true,
+      },
+    ]);
+  });
+
+  it("builds clear-flag actions for a flagged current tune", () => {
+    expect(
+      buildCurrentTuneFlagActionModels(
+        tune({
+          excludedFromReview: true,
+          sessionMaintained: true,
+        }),
+      ),
+    ).toEqual([
+      {
+        flag: "excludedFromReview",
+        label: "Include in reviews",
+        value: false,
+      },
+      {
+        flag: "sessionMaintained",
+        label: "Unmark as session maintained",
+        value: false,
+      },
+    ]);
+  });
 });
+
+function tune(review: Tune["review"] = {
+  excludedFromReview: false,
+  sessionMaintained: false,
+}): Tune {
+  return {
+    id: "one",
+    keys: [],
+    path: "Tunes/Tunes/One.md",
+    review,
+    title: "One",
+  };
+}

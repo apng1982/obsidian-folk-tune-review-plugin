@@ -17,9 +17,13 @@ export class ObsidianReviewWriter implements ReviewWriter {
     });
   }
 
-  async writeReviewFlag(tune: Tune, flag: ReviewFlag): Promise<void> {
+  async writeReviewFlag(
+    tune: Tune,
+    flag: ReviewFlag,
+    value: boolean,
+  ): Promise<void> {
     await this.processReviewFrontmatter(tune, (frontmatter) => {
-      applyReviewFlagToFrontmatter(frontmatter, flag);
+      applyReviewFlagToFrontmatter(frontmatter, flag, value);
     });
   }
 

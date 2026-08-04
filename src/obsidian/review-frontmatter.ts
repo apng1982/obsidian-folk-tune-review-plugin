@@ -25,6 +25,7 @@ export function applyReviewStateToFrontmatter(
 export function applyReviewFlagToFrontmatter(
   frontmatter: Record<string, unknown>,
   flag: ReviewFlag,
+  value: boolean,
 ): void {
   const existingReview = frontmatter.review;
   if (
@@ -36,7 +37,7 @@ export function applyReviewFlagToFrontmatter(
 
   frontmatter.review = {
     ...(existingReview ?? {}),
-    [flag]: true,
+    [flag]: value,
   };
 }
 

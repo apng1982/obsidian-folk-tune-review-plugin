@@ -11,6 +11,12 @@ export interface TuneSelectionOptions {
   readonly today: LocalDate;
 }
 
+export interface TuneEligibilityOptions {
+  readonly includeExcluded: boolean;
+  readonly includeSessionMaintained: boolean;
+  readonly originFilter?: string;
+}
+
 export interface TuneDueInfo {
   readonly dueDate?: LocalDate;
   readonly isDue: boolean;
@@ -54,7 +60,7 @@ export function selectTunes(
   validateRequestedCount(options.count);
 
   const eligibleTunes = tunes
-    .filter((tune) => isEligibleTune(tune, options))
+    .filter((tune) => isTuneEligibleForSelection(tune, options))
     .map<TuneWithDueInfo>((tune) => ({
       dueInfo: calculateTuneDueInfo(tune, options.today),
       tune,
@@ -86,7 +92,10 @@ export function selectTunes(
     .map(({ tune }) => tune);
 }
 
-function isEligibleTune(tune: Tune, options: TuneSelectionOptions): boolean {
+export function isTuneEligibleForSelection(
+  tune: Tune,
+  options: TuneEligibilityOptions,
+): boolean {
   if (!isLearnedTune(tune) || tune.id === undefined || tune.id.length === 0) {
     return false;
   }

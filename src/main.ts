@@ -6,6 +6,10 @@ import {
 import { TuneFolderNotFoundError } from "./application/tune-folder-not-found-error";
 import type { ReviewMode } from "./domain/review-mode";
 import type { Tune } from "./domain/tune";
+import {
+  validateCurrentTuneReviewCandidate,
+  type CurrentTuneReviewCandidateResult,
+} from "./obsidian/current-tune-review-candidate";
 import { ObsidianNoteOpener } from "./obsidian/obsidian-note-opener";
 import { ObsidianNoteReader } from "./obsidian/obsidian-note-reader";
 import { ObsidianReviewWriter } from "./obsidian/obsidian-review-writer";
@@ -20,6 +24,7 @@ import {
   REVIEW_QUEUE_VIEW_TYPE,
   ReviewQueueView,
 } from "./ui/review-queue-view";
+import { CurrentTuneReviewModal } from "./ui/current-tune-review-modal";
 import { NotePreviewModal } from "./ui/note-preview-modal";
 import { ReviewStartModal } from "./ui/review-start-modal";
 import type { ReviewStartRequest } from "./ui/review-start-modal";
@@ -83,6 +88,13 @@ export default class FolkTuneReviewPlugin extends Plugin {
         ).open();
       },
     });
+    this.addCommand({
+      id: "review-current-tune",
+      name: "Add review to current tune",
+      callback: () => {
+        this.openCurrentTuneReview();
+      },
+    });
   }
 
   async updateSettings(changes: Partial<PluginSettings>): Promise<void> {
@@ -136,5 +148,52 @@ export default class FolkTuneReviewPlugin extends Plugin {
       this.app.workspace.getLeavesOfType(REVIEW_QUEUE_VIEW_TYPE)[0] ??
       this.app.workspace.getLeaf("tab")
     );
+  }
+
+  private openCurrentTuneReview(): void {
+    const activeFile = this.app.workspace.getActiveFile();
+    const candidate = validateCurrentTuneReviewCandidate(
+      activeFile === null
+        ? undefined
+        : {
+            basename: activeFile.basename,
+            frontmatter:
+              this.app.metadataCache.getFileCache(activeFile)?.frontmatter,
+            path: activeFile.path,
+          },
+      this.settings.tuneFolder,
+    );
+
+    if (candidate.type === "invalid") {
+      new Notice(this.getCurrentTuneReviewValidationMessage(candidate));
+      return;
+    }
+
+    new CurrentTuneReviewModal(
+      this.app,
+      candidate.tune,
+      new SystemClock(),
+      new ObsidianReviewWriter(this.app),
+      () => {
+        new Notice(
+          "Cannot update review metadata for this tune. The note may have invalid frontmatter.",
+        );
+      },
+    ).open();
+  }
+
+  private getCurrentTuneReviewValidationMessage(
+    result: Extract<CurrentTuneReviewCandidateResult, { type: "invalid" }>,
+  ): string {
+    switch (result.reason) {
+      case "no-active-file":
+        return "Open a tune note before adding a review.";
+      case "outside-tune-folder":
+        return "Current note is not in the configured tune folder.";
+      case "invalid-tune-metadata":
+        return "Current note cannot be reviewed. Check its tune metadata.";
+      case "ineligible-tune":
+        return "Current tune is not eligible for review.";
+    }
   }
 }

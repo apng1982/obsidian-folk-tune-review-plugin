@@ -4,6 +4,7 @@ import { parseLocalDate } from "../../src/domain/dates";
 import { createReviewState } from "../../src/domain/review-state";
 import {
   calculateTuneDueInfo,
+  isTuneEligibleForSelection,
   selectTunes,
   type TuneSelectionOptions,
 } from "../../src/domain/tune-selection";
@@ -149,6 +150,41 @@ describe("tune selection", () => {
         () => randomValues.shift() ?? 0,
       ).map(({ id }) => id),
     ).toEqual(["due-1", "due-2", "never-2", "never-1", "non-due-2", "non-due-1"]);
+  });
+});
+
+describe("tune selection eligibility", () => {
+  it("accepts learned tunes with IDs and no review flags", () => {
+    expect(
+      isTuneEligibleForSelection(tune("one"), {
+        includeExcluded: false,
+        includeSessionMaintained: false,
+      }),
+    ).toBe(true);
+  });
+
+  it("rejects tunes that default queue selection should not allow", () => {
+    const options = {
+      includeExcluded: false,
+      includeSessionMaintained: false,
+    };
+
+    expect(isTuneEligibleForSelection(tune(undefined), options)).toBe(false);
+    expect(isTuneEligibleForSelection(tune("learning", {}, "Learning", true), options)).toBe(
+      false,
+    );
+    expect(
+      isTuneEligibleForSelection(
+        tune("excluded", { excludedFromReview: true }),
+        options,
+      ),
+    ).toBe(false);
+    expect(
+      isTuneEligibleForSelection(
+        tune("session", { sessionMaintained: true }),
+        options,
+      ),
+    ).toBe(false);
   });
 });
 

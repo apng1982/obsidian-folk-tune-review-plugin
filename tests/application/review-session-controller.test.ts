@@ -98,6 +98,7 @@ describe("review session controller", () => {
     expect(writer.writeReviewFlag).toHaveBeenCalledWith(
       first,
       "excludedFromReview",
+      true,
     );
     expect(writer.writeReview).not.toHaveBeenCalled();
     expect(controller.session.items[0]?.outcome.type).toBe("excluded");
@@ -120,6 +121,7 @@ describe("review session controller", () => {
     expect(writer.writeReviewFlag).toHaveBeenCalledWith(
       first,
       "sessionMaintained",
+      true,
     );
     expect(writer.writeReview).not.toHaveBeenCalled();
     expect(controller.session.items[0]?.outcome.type).toBe(

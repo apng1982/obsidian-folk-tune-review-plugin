@@ -67,12 +67,36 @@ describe("Obsidian review writer", () => {
     };
     const writer = new ObsidianReviewWriter(app as never);
 
-    await writer.writeReviewFlag(tune("one"), "sessionMaintained");
+    await writer.writeReviewFlag(tune("one"), "sessionMaintained", true);
 
     expect(app.vault.getFileByPath).toHaveBeenCalledWith("Tunes/Tunes/one.md");
     expect(processFrontMatter).toHaveBeenCalledWith(file, expect.any(Function));
     expect(frontmatter.review).toEqual({
       sessionMaintained: true,
+    });
+  });
+
+  it("can clear review flags through processFrontMatter", async () => {
+    const file = { path: "Tunes/Tunes/one.md" };
+    const frontmatter: Record<string, unknown> = {
+      review: { excludedFromReview: true },
+    };
+    const processFrontMatter = vi.fn(
+      (_file: unknown, mutate: (value: Record<string, unknown>) => void) => {
+        mutate(frontmatter);
+        return Promise.resolve();
+      },
+    );
+    const app = {
+      fileManager: { processFrontMatter },
+      vault: { getFileByPath: vi.fn().mockReturnValue(file) },
+    };
+    const writer = new ObsidianReviewWriter(app as never);
+
+    await writer.writeReviewFlag(tune("one"), "excludedFromReview", false);
+
+    expect(frontmatter.review).toEqual({
+      excludedFromReview: false,
     });
   });
 });

@@ -5,5 +5,5 @@ export type ReviewFlag = "excludedFromReview" | "sessionMaintained";
 
 export interface ReviewWriter {
   writeReview(tune: Tune, review: ReviewState): Promise<void>;
-  writeReviewFlag(tune: Tune, flag: ReviewFlag): Promise<void>;
+  writeReviewFlag(tune: Tune, flag: ReviewFlag, value: boolean): Promise<void>;
 }

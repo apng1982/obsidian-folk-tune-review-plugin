@@ -86,6 +86,6 @@ export class ReviewSessionController {
       throw new Error("Live review session has no writable current tune.");
     }
 
-    await this.writer.writeReviewFlag(tune, flag);
+    await this.writer.writeReviewFlag(tune, flag, true);
   }
 }

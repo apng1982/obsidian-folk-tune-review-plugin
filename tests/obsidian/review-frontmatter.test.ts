@@ -81,7 +81,7 @@ describe("review frontmatter mutation", () => {
       id: "one",
     };
 
-    applyReviewFlagToFrontmatter(frontmatter, "excludedFromReview");
+    applyReviewFlagToFrontmatter(frontmatter, "excludedFromReview", true);
 
     expect(frontmatter).toEqual({
       composer: "(trad.)",
@@ -102,7 +102,7 @@ describe("review frontmatter mutation", () => {
       },
     };
 
-    applyReviewFlagToFrontmatter(frontmatter, "sessionMaintained");
+    applyReviewFlagToFrontmatter(frontmatter, "sessionMaintained", true);
 
     expect(frontmatter.review).toEqual({
       intervalDays: 365,
@@ -110,6 +110,28 @@ describe("review frontmatter mutation", () => {
       nextDue: "2027-06-08",
       score: 9,
       sessionMaintained: true,
+    });
+  });
+
+  it("clears a review flag while preserving existing review state", () => {
+    const frontmatter: Record<string, unknown> = {
+      review: {
+        excludedFromReview: true,
+        intervalDays: 365,
+        lastReviewed: "2026-06-08",
+        nextDue: "2027-06-08",
+        score: 9,
+      },
+    };
+
+    applyReviewFlagToFrontmatter(frontmatter, "excludedFromReview", false);
+
+    expect(frontmatter.review).toEqual({
+      excludedFromReview: false,
+      intervalDays: 365,
+      lastReviewed: "2026-06-08",
+      nextDue: "2027-06-08",
+      score: 9,
     });
   });
 
@@ -127,6 +149,7 @@ describe("review frontmatter mutation", () => {
       applyReviewFlagToFrontmatter(
         { review: "invalid" },
         "sessionMaintained",
+        true,
       ),
     ).toThrow("Review metadata must be an object.");
   });
