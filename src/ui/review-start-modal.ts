@@ -5,6 +5,7 @@ import type { ReviewMode } from "../domain/review-mode";
 
 export interface ReviewStartDefaults {
   readonly count: number;
+  readonly devTestMode: boolean;
   readonly includeExcluded: boolean;
   readonly includeSessionMaintained: boolean;
   readonly mode: ReviewMode;
@@ -17,6 +18,7 @@ export interface ReviewStartRequest {
 
 export class ReviewStartModal extends Modal {
   private count: number;
+  private devTestMode: boolean;
   private includeExcluded: boolean;
   private includeSessionMaintained: boolean;
   private mode: ReviewMode;
@@ -29,6 +31,7 @@ export class ReviewStartModal extends Modal {
   ) {
     super(app);
     this.count = defaults.count;
+    this.devTestMode = defaults.devTestMode;
     this.includeExcluded = defaults.includeExcluded;
     this.includeSessionMaintained = defaults.includeSessionMaintained;
     this.mode = defaults.mode;
@@ -39,21 +42,8 @@ export class ReviewStartModal extends Modal {
     this.contentEl.addClass("folk-tune-review-setup");
 
     this.contentEl.createEl("p", {
-      text: "Choose the tunes to include and whether the review should write changes.",
+      text: "Choose the tunes to include in this review.",
     });
-
-    new Setting(this.contentEl)
-      .setName("Review mode")
-      .setDesc("Live reviews update tune metadata. Dry runs write nothing.")
-      .addDropdown((dropdown) => {
-        dropdown
-          .addOption("live", "Live review")
-          .addOption("dry-run", "Dry run")
-          .setValue(this.mode)
-          .onChange((value) => {
-            this.mode = value === "dry-run" ? "dry-run" : "live";
-          });
-      });
 
     new Setting(this.contentEl)
       .setName("Number of tunes")
@@ -93,6 +83,21 @@ export class ReviewStartModal extends Modal {
           this.includeExcluded = value;
         });
       });
+
+    if (this.devTestMode) {
+      new Setting(this.contentEl)
+        .setName("Review mode")
+        .setDesc("Live reviews update tune metadata. Dry runs write nothing.")
+        .addDropdown((dropdown) => {
+          dropdown
+            .addOption("live", "Live review")
+            .addOption("dry-run", "Dry run")
+            .setValue(this.mode)
+            .onChange((value) => {
+              this.mode = value === "dry-run" ? "dry-run" : "live";
+            });
+        });
+    }
 
     let buildQueueButton: HTMLButtonElement | undefined;
     new Setting(this.contentEl).addButton((button) => {

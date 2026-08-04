@@ -10,9 +10,10 @@ describe("plugin settings", () => {
     expect(mergePluginSettings(undefined)).toEqual(DEFAULT_SETTINGS);
     expect(DEFAULT_SETTINGS).toEqual({
       defaultReviewCount: 10,
+      devTestMode: false,
       includeExcludedByDefault: false,
       includeSessionMaintainedByDefault: false,
-      tuneFolder: "Tunes/Tunes",
+      tuneFolder: "Repertoire/Tunes",
     });
   });
 
@@ -20,12 +21,14 @@ describe("plugin settings", () => {
     expect(
       mergePluginSettings({
         defaultReviewCount: 20,
+        devTestMode: true,
         includeExcludedByDefault: true,
         includeSessionMaintainedByDefault: true,
         tuneFolder: "My Tunes",
       }),
     ).toEqual({
       defaultReviewCount: 20,
+      devTestMode: true,
       includeExcludedByDefault: true,
       includeSessionMaintainedByDefault: true,
       tuneFolder: "My Tunes",
@@ -36,6 +39,7 @@ describe("plugin settings", () => {
     expect(
       mergePluginSettings({
         defaultReviewCount: 0,
+        devTestMode: "yes",
         includeExcludedByDefault: "yes",
         includeSessionMaintainedByDefault: null,
         tuneFolder: " ",

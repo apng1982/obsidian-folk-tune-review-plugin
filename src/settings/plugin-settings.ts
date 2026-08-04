@@ -1,5 +1,6 @@
 export interface PluginSettings {
   readonly defaultReviewCount: number;
+  readonly devTestMode: boolean;
   readonly includeExcludedByDefault: boolean;
   readonly includeSessionMaintainedByDefault: boolean;
   readonly tuneFolder: string;
@@ -7,9 +8,10 @@ export interface PluginSettings {
 
 export const DEFAULT_SETTINGS: PluginSettings = {
   defaultReviewCount: 10,
+  devTestMode: false,
   includeExcludedByDefault: false,
   includeSessionMaintainedByDefault: false,
-  tuneFolder: "Tunes/Tunes",
+  tuneFolder: "Repertoire/Tunes",
 };
 
 export function mergePluginSettings(value: unknown): PluginSettings {
@@ -22,6 +24,7 @@ export function mergePluginSettings(value: unknown): PluginSettings {
       value.defaultReviewCount,
       DEFAULT_SETTINGS.defaultReviewCount,
     ),
+    devTestMode: readBoolean(value.devTestMode, DEFAULT_SETTINGS.devTestMode),
     includeExcludedByDefault: readBoolean(
       value.includeExcludedByDefault,
       DEFAULT_SETTINGS.includeExcludedByDefault,

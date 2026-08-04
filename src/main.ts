@@ -73,6 +73,7 @@ export default class FolkTuneReviewPlugin extends Plugin {
           this.app,
           {
             count: this.settings.defaultReviewCount,
+            devTestMode: this.settings.devTestMode,
             includeExcluded: this.settings.includeExcludedByDefault,
             includeSessionMaintained:
               this.settings.includeSessionMaintainedByDefault,

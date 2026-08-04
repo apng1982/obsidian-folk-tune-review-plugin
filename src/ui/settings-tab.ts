@@ -56,5 +56,14 @@ export class FolkTuneReviewSettingsTab extends PluginSettingTab {
             await plugin.updateSettings({ includeExcludedByDefault: value });
           });
       });
+
+    new Setting(this.containerEl)
+      .setName("Dev/test mode")
+      .setDesc("Show advanced review testing controls.")
+      .addToggle((toggle) => {
+        toggle.setValue(plugin.settings.devTestMode).onChange(async (value) => {
+          await plugin.updateSettings({ devTestMode: value });
+        });
+      });
   }
 }
