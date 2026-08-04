@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getCurrentTuneReviewValidationMessage,
   validateCurrentTuneReviewCandidate,
   type CurrentTuneReviewFile,
 } from "../../src/obsidian/current-tune-review-candidate";
@@ -59,7 +60,7 @@ describe("current tune review candidate validation", () => {
         tuneFolder,
       ),
     ).toEqual({
-      reason: "ineligible-tune",
+      reason: "not-learned",
       type: "invalid",
     });
 
@@ -69,7 +70,7 @@ describe("current tune review candidate validation", () => {
         tuneFolder,
       ),
     ).toEqual({
-      reason: "ineligible-tune",
+      reason: "not-learned",
       type: "invalid",
     });
   });
@@ -123,6 +124,42 @@ describe("current tune review candidate validation", () => {
       },
       type: "valid",
     });
+  });
+});
+
+describe("current tune review validation messages", () => {
+  it("explains why current-note review cannot start", () => {
+    expect(
+      getCurrentTuneReviewValidationMessage(
+        { reason: "no-active-file", type: "invalid" },
+        tuneFolder,
+      ),
+    ).toBe("Open a tune note before adding a review.");
+
+    expect(
+      getCurrentTuneReviewValidationMessage(
+        { reason: "outside-tune-folder", type: "invalid" },
+        tuneFolder,
+      ),
+    ).toBe("Only notes in Repertoire/Tunes can be reviewed with this command.");
+
+    expect(
+      getCurrentTuneReviewValidationMessage(
+        { reason: "invalid-tune-metadata", type: "invalid" },
+        tuneFolder,
+      ),
+    ).toBe(
+      "This note cannot be reviewed because its tune metadata could not be read. Check the YAML frontmatter.",
+    );
+
+    expect(
+      getCurrentTuneReviewValidationMessage(
+        { reason: "not-learned", type: "invalid" },
+        tuneFolder,
+      ),
+    ).toBe(
+      "Only tune notes that have already been learned (learn: false) are eligible for review.",
+    );
   });
 });
 

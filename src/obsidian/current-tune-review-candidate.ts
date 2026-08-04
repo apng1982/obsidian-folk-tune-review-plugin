@@ -12,7 +12,7 @@ export type CurrentTuneReviewCandidateResult =
   | { readonly reason: "no-active-file"; readonly type: "invalid" }
   | { readonly reason: "outside-tune-folder"; readonly type: "invalid" }
   | { readonly reason: "invalid-tune-metadata"; readonly type: "invalid" }
-  | { readonly reason: "ineligible-tune"; readonly type: "invalid" }
+  | { readonly reason: "not-learned"; readonly type: "invalid" }
   | { readonly tune: Tune; readonly type: "valid" };
 
 export function validateCurrentTuneReviewCandidate(
@@ -49,7 +49,7 @@ export function validateCurrentTuneReviewCandidate(
 
   if (tune.learn !== false) {
     return {
-      reason: "ineligible-tune",
+      reason: "not-learned",
       type: "invalid",
     };
   }
@@ -58,4 +58,20 @@ export function validateCurrentTuneReviewCandidate(
     tune,
     type: "valid",
   };
+}
+
+export function getCurrentTuneReviewValidationMessage(
+  result: Extract<CurrentTuneReviewCandidateResult, { type: "invalid" }>,
+  tuneFolder: string,
+): string {
+  switch (result.reason) {
+    case "no-active-file":
+      return "Open a tune note before adding a review.";
+    case "outside-tune-folder":
+      return `Only notes in ${tuneFolder} can be reviewed with this command.`;
+    case "invalid-tune-metadata":
+      return "This note cannot be reviewed because its tune metadata could not be read. Check the YAML frontmatter.";
+    case "not-learned":
+      return "Only tune notes that have already been learned (learn: false) are eligible for review.";
+  }
 }

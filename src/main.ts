@@ -7,8 +7,8 @@ import { TuneFolderNotFoundError } from "./application/tune-folder-not-found-err
 import type { ReviewMode } from "./domain/review-mode";
 import type { Tune } from "./domain/tune";
 import {
+  getCurrentTuneReviewValidationMessage,
   validateCurrentTuneReviewCandidate,
-  type CurrentTuneReviewCandidateResult,
 } from "./obsidian/current-tune-review-candidate";
 import { ObsidianNoteOpener } from "./obsidian/obsidian-note-opener";
 import { ObsidianNoteReader } from "./obsidian/obsidian-note-reader";
@@ -166,7 +166,12 @@ export default class FolkTuneReviewPlugin extends Plugin {
     );
 
     if (candidate.type === "invalid") {
-      new Notice(this.getCurrentTuneReviewValidationMessage(candidate));
+      new Notice(
+        getCurrentTuneReviewValidationMessage(
+          candidate,
+          this.settings.tuneFolder,
+        ),
+      );
       return;
     }
 
@@ -181,20 +186,5 @@ export default class FolkTuneReviewPlugin extends Plugin {
         );
       },
     ).open();
-  }
-
-  private getCurrentTuneReviewValidationMessage(
-    result: Extract<CurrentTuneReviewCandidateResult, { type: "invalid" }>,
-  ): string {
-    switch (result.reason) {
-      case "no-active-file":
-        return "Open a tune note before adding a review.";
-      case "outside-tune-folder":
-        return "Current note is not in the configured tune folder.";
-      case "invalid-tune-metadata":
-        return "Current note cannot be reviewed. Check its tune metadata.";
-      case "ineligible-tune":
-        return "Current tune is not eligible for review.";
-    }
   }
 }
