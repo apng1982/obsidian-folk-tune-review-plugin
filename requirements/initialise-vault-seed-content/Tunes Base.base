@@ -1,0 +1,113 @@
+filters:
+  and:
+    - file.folder == "Repertoire/Tunes"
+properties:
+  file.name:
+    displayName: Tune
+views:
+  - type: table
+    name: Recent tunes learned
+    filters:
+      and:
+        - file.folder == "Repertoire/Tunes"
+        - learn == false
+        - learned >= (today() - "60d")
+    order:
+      - file.name
+      - key
+      - type
+      - origin
+      - learned
+      - mode
+      - composer
+    sort:
+      - property: learned
+        direction: DESC
+    columnSize:
+      note.key: 170
+      note.mode: 152
+  - type: table
+    name: Repertoire
+    filters:
+      and:
+        - file.folder == "Repertoire/Tunes"
+        - learn == false
+    order:
+      - file.name
+      - key
+      - type
+      - origin
+      - learn
+      - learned
+      - mode
+      - composer
+    sort:
+      - property: file.name
+        direction: DESC
+    columnSize:
+      note.key: 170
+      note.mode: 152
+  - type: table
+    name: Flagged tunes
+    filters:
+      and:
+        - file.folder == "Repertoire/Tunes"
+        - learn == false
+        - file.tags.contains("#flag")
+    order:
+      - file.name
+      - key
+      - type
+      - origin
+      - learn
+      - learned
+      - mode
+      - composer
+    sort:
+      - property: learned
+        direction: DESC
+    columnSize:
+      note.key: 170
+      note.mode: 152
+  - type: table
+    name: Unplanned tunes to learn
+    filters:
+      and:
+        - file.folder == "Repertoire/Tunes"
+        - learn == true
+    order:
+      - file.name
+      - key
+      - type
+      - origin
+      - learn
+      - learned
+      - mode
+      - composer
+    sort:
+      - property: review
+        direction: DESC
+    columnSize:
+      note.key: 170
+      note.mode: 152
+  - type: table
+    name: In progress
+    filters:
+      and:
+        - file.folder == "Repertoire/Tunes"
+        - learn == true
+        - learned <= today()
+    order:
+      - file.name
+      - key
+      - type
+      - origin
+      - learned
+      - mode
+      - composer
+    sort:
+      - property: learned
+        direction: DESC
+    columnSize:
+      note.key: 170
+      note.mode: 152

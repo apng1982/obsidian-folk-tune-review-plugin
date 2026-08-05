@@ -1,0 +1,22 @@
+properties:
+  note.Awesomeness:
+    displayName: 😎
+views:
+  - type: table
+    name: All Sets
+    filters:
+      and:
+        - file.folder == "Repertoire/Sets"
+    order:
+      - Title
+      - Awesomeness
+      - file.name
+      - Type
+      - Sessions
+      - origin
+    sort:
+      - property: Awesomeness
+        direction: DESC
+    columnSize:
+      file.name: 438
+      note.Awesomeness: 80
