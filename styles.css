@@ -53,6 +53,19 @@
   justify-content: space-between;
 }
 
+.folk-tune-review-queue-item-badges {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--size-4-2);
+}
+
+.folk-tune-review-rag-status {
+  display: inline-block;
+  font-size: var(--font-small);
+  line-height: 1;
+}
+
 .folk-tune-review-outcome {
   background: var(--background-modifier-hover);
   border-radius: var(--radius-s);

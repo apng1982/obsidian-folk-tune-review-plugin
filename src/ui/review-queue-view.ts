@@ -13,6 +13,7 @@ import type { Clock } from "../ports/clock";
 import type { ReviewWriter } from "../ports/review-writer";
 import {
   buildReviewQueueItemModel,
+  buildReviewQueueStatusModel,
   buildScoreIntervalModels,
 } from "./review-queue-model";
 
@@ -357,8 +358,20 @@ export class ReviewQueueView extends ItemView {
       cls: "folk-tune-review-queue-item-heading",
     });
     heading.createEl("h4", { text: item.title });
+    const badges = heading.createDiv({
+      cls: "folk-tune-review-queue-item-badges",
+    });
+    const reviewStatus = buildReviewQueueStatusModel(tune, this.clock.today());
+    badges.createEl("span", {
+      attr: {
+        "aria-label": reviewStatus.label,
+        title: reviewStatus.label,
+      },
+      cls: `folk-tune-review-rag-status is-${reviewStatus.status}`,
+      text: reviewStatus.symbol,
+    });
     if (outcome !== undefined) {
-      heading.createEl("span", {
+      badges.createEl("span", {
         cls: "folk-tune-review-outcome",
         text: this.getOutcomeLabel(outcome, isCurrent),
       });

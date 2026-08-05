@@ -1,4 +1,6 @@
 import { REVIEW_INTERVAL_DAYS } from "../domain/review-score";
+import type { LocalDate } from "../domain/dates";
+import { calculateTuneDueInfo } from "../domain/tune-selection";
 import type { Tune } from "../domain/tune";
 import type { ReviewFlag } from "../ports/review-writer";
 
@@ -8,6 +10,14 @@ export interface ReviewQueueItemModel {
   readonly origin?: string;
   readonly path: string;
   readonly title: string;
+}
+
+export type ReviewQueueStatus = "due" | "never-reviewed" | "not-due";
+
+export interface ReviewQueueStatusModel {
+  readonly label: string;
+  readonly status: ReviewQueueStatus;
+  readonly symbol: string;
 }
 
 export interface ScoreIntervalModel {
@@ -29,6 +39,35 @@ export function buildReviewQueueItemModel(tune: Tune): ReviewQueueItemModel {
     origin: tune.origin,
     path: tune.path,
     title: tune.title,
+  };
+}
+
+export function buildReviewQueueStatusModel(
+  tune: Pick<Tune, "review">,
+  today: LocalDate,
+): ReviewQueueStatusModel {
+  const dueInfo = calculateTuneDueInfo(tune, today);
+
+  if (dueInfo.neverReviewed) {
+    return {
+      label: "Never reviewed",
+      status: "never-reviewed",
+      symbol: "🟠",
+    };
+  }
+
+  if (dueInfo.isDue) {
+    return {
+      label: "Due for review",
+      status: "due",
+      symbol: "🔴",
+    };
+  }
+
+  return {
+    label: "Not due",
+    status: "not-due",
+    symbol: "🟢",
   };
 }
 
