@@ -173,6 +173,15 @@
   background: var(--background-secondary-alt);
 }
 
+.folk-tune-review-summary-row-indented dt {
+  padding-left: var(--size-4-4);
+}
+
+.folk-tune-review-summary-row-indented dt::before {
+  color: var(--text-faint);
+  content: "- ";
+}
+
 .folk-tune-review-summary dd {
   font-weight: var(--font-semibold);
   margin: 0;
@@ -198,6 +207,69 @@
   min-height: 2.75rem;
   padding: var(--size-4-2);
   text-align: center;
+}
+
+.folk-tune-review-stats-section {
+  border-top: 1px solid var(--background-modifier-border);
+  margin-top: var(--size-4-5);
+  padding-top: var(--size-4-3);
+}
+
+.folk-tune-review-stats-section:first-child {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.folk-tune-review-stats-section h3 {
+  margin-top: 0;
+}
+
+.folk-tune-review-stats-description {
+  color: var(--text-muted);
+  margin-top: calc(var(--size-4-2) * -1);
+}
+
+.folk-tune-review-stats-score-grid .folk-tune-review-score {
+  align-items: center;
+  display: grid;
+  gap: var(--size-2-1);
+}
+
+.folk-tune-review-stats-score-grid .folk-tune-review-score span {
+  color: var(--text-muted);
+  font-size: var(--font-small);
+}
+
+.folk-tune-review-stats-overdue {
+  display: grid;
+  gap: var(--size-4-3);
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
+}
+
+.folk-tune-review-stats-overdue-item {
+  padding: 0;
+}
+
+.folk-tune-review-stats-overdue-link {
+  border-radius: inherit;
+  color: inherit;
+  display: block;
+  padding: var(--size-4-3);
+  text-decoration: none;
+}
+
+.folk-tune-review-stats-overdue-link:hover {
+  background: var(--background-modifier-hover);
+  color: inherit;
+  text-decoration: none;
+}
+
+.folk-tune-review-stats-overdue-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--interactive-accent);
+  outline: none;
 }
 
 @media (max-width: 500px) {

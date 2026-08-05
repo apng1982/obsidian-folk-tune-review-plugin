@@ -1,10 +1,12 @@
-import { Notice, Plugin, type WorkspaceLeaf } from "obsidian";
+import { Notice, Plugin, TFile, type WorkspaceLeaf } from "obsidian";
 
 import {
   buildReviewQueue,
 } from "./application/build-review-queue";
+import { buildTuneStats } from "./application/build-tune-stats";
 import { TuneFolderNotFoundError } from "./application/tune-folder-not-found-error";
 import type { ReviewMode } from "./domain/review-mode";
+import type { MostOverdueTune } from "./domain/tune-stats";
 import type { Tune } from "./domain/tune";
 import {
   getCurrentTuneReviewValidationMessage,
@@ -29,6 +31,7 @@ import { NotePreviewModal } from "./ui/note-preview-modal";
 import { ReviewStartModal } from "./ui/review-start-modal";
 import type { ReviewStartRequest } from "./ui/review-start-modal";
 import { FolkTuneReviewSettingsTab } from "./ui/settings-tab";
+import { TuneStatsModal } from "./ui/tune-stats-modal";
 
 export default class FolkTuneReviewPlugin extends Plugin {
   settings: PluginSettings = DEFAULT_SETTINGS;
@@ -94,6 +97,13 @@ export default class FolkTuneReviewPlugin extends Plugin {
       name: "Add review to current tune",
       callback: () => {
         this.openCurrentTuneReview();
+      },
+    });
+    this.addCommand({
+      id: "show-stats",
+      name: "Show stats",
+      callback: () => {
+        void this.openStats();
       },
     });
   }
@@ -186,5 +196,34 @@ export default class FolkTuneReviewPlugin extends Plugin {
         );
       },
     ).open();
+  }
+
+  private async openStats(): Promise<void> {
+    try {
+      const stats = await buildTuneStats(
+        new ObsidianTuneRepository(this.app, this.settings.tuneFolder),
+        new SystemClock(),
+      );
+      new TuneStatsModal(this.app, stats, async (tune) => {
+        await this.openStatsTune(tune);
+      }).open();
+    } catch (error) {
+      if (error instanceof TuneFolderNotFoundError) {
+        new Notice("Tune folder not found. Open settings or run Initialize vault.");
+        return;
+      }
+
+      new Notice("Could not build tune stats. Check tune metadata and try again.");
+    }
+  }
+
+  private async openStatsTune(tune: MostOverdueTune): Promise<void> {
+    const file = this.app.vault.getAbstractFileByPath(tune.path);
+    if (!(file instanceof TFile)) {
+      new Notice("Could not open tune note. It may have been moved or deleted.");
+      return;
+    }
+
+    await this.app.workspace.getLeaf("tab").openFile(file);
   }
 }

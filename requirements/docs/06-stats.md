@@ -46,7 +46,6 @@ Suggested fields:
 - title;
 - due date;
 - overdue days;
-- origin(s);
 - last score.
 
 ## Score distribution
@@ -61,17 +60,6 @@ Show how many tunes currently have each last score:
 ```
 
 Tunes with no review should be counted separately as never reviewed.
-
-## Origin stats
-
-Show counts by origin where metadata supports it.
-
-Potential values:
-
-- total learned;
-- eligible;
-- due/overdue;
-- never reviewed.
 
 ## UI surface
 
@@ -96,7 +84,6 @@ Tests should cover:
 - due today;
 - overdue tunes;
 - excluded/session-maintained filtering;
-- origin grouping;
 - invalid/missing review metadata handling;
 - date boundary cases.
 
