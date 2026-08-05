@@ -20,7 +20,6 @@ Initial stats should include:
 - overdue tunes;
 - most overdue tunes;
 - reviewed recently;
-- counts by origin;
 - counts by score;
 - counts by next-due band.
 
