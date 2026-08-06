@@ -1,5 +1,5 @@
 ---
-origin: "[[Ref/Geo/Irish|Irish]]"
+origin: "[[Ref/Origin/Irish|Irish]]"
 ---
 
 ## Repertoire

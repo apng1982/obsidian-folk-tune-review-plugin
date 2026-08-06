@@ -3,6 +3,10 @@ import { Notice, Plugin, TFile, type WorkspaceLeaf } from "obsidian";
 import {
   buildReviewQueue,
 } from "./application/build-review-queue";
+import {
+  applyVaultInitializationPlan,
+  buildVaultInitializationPlan,
+} from "./application/initialize-vault";
 import { buildTuneStats } from "./application/build-tune-stats";
 import { TuneFolderNotFoundError } from "./application/tune-folder-not-found-error";
 import type { ReviewMode } from "./domain/review-mode";
@@ -16,7 +20,9 @@ import { ObsidianNoteOpener } from "./obsidian/obsidian-note-opener";
 import { ObsidianNoteReader } from "./obsidian/obsidian-note-reader";
 import { ObsidianReviewWriter } from "./obsidian/obsidian-review-writer";
 import { ObsidianTuneRepository } from "./obsidian/obsidian-tune-repository";
+import { ObsidianVaultInitializer } from "./obsidian/obsidian-vault-initializer";
 import { SystemClock } from "./obsidian/system-clock";
+import { DEFAULT_VAULT_SEED } from "./seed/default-vault-seed";
 import {
   DEFAULT_SETTINGS,
   mergePluginSettings,
@@ -27,6 +33,7 @@ import {
   ReviewQueueView,
 } from "./ui/review-queue-view";
 import { CurrentTuneReviewModal } from "./ui/current-tune-review-modal";
+import { InitializeVaultModal } from "./ui/initialize-vault-modal";
 import { NotePreviewModal } from "./ui/note-preview-modal";
 import { ReviewStartModal } from "./ui/review-start-modal";
 import type { ReviewStartRequest } from "./ui/review-start-modal";
@@ -104,6 +111,13 @@ export default class FolkTuneReviewPlugin extends Plugin {
       name: "Show stats",
       callback: () => {
         void this.openStats();
+      },
+    });
+    this.addCommand({
+      id: "initialize-vault",
+      name: "Admin - Initialize vault",
+      callback: () => {
+        void this.openInitializeVault();
       },
     });
   }
@@ -225,5 +239,21 @@ export default class FolkTuneReviewPlugin extends Plugin {
     }
 
     await this.app.workspace.getLeaf("tab").openFile(file);
+  }
+
+  private async openInitializeVault(): Promise<void> {
+    const initializer = new ObsidianVaultInitializer(this.app);
+
+    try {
+      const plan = await buildVaultInitializationPlan(
+        initializer,
+        DEFAULT_VAULT_SEED,
+      );
+      new InitializeVaultModal(this.app, plan, async (planToApply) => {
+        return applyVaultInitializationPlan(initializer, planToApply);
+      }).open();
+    } catch {
+      new Notice("Could not inspect vault for initialization.");
+    }
   }
 }

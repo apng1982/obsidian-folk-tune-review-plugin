@@ -1,5 +1,5 @@
 ---
-origin: "[[Ref/Geo/Scottish|Scottish]]"
+origin: "[[Ref/Origin/Scottish|Scottish]]"
 ---
 
 ## Repertoire

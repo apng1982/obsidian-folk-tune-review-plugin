@@ -5,7 +5,7 @@ Tunes:
   - "[[Repertoire/Tunes/Pitt Street Jig|Pitt Street Jig]]"
   - "[[Repertoire/Tunes/McGoldrick's No. 2|McGoldrick's No. 2]]"
 Awesomeness: 7.9
-Origin: "[[Ref/Geo/English|English]]"
+Origin: "[[Ref/Origin/English|English]]"
 Type: "[[Ref/Type/Jig|Jig]]"
 Sessions: []
 Session Ready:

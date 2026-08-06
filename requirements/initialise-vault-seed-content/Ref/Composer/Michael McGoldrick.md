@@ -1,5 +1,5 @@
 ---
-origin: "[[Ref/Geo/English|English]]"
+origin: "[[Ref/Origin/English|English]]"
 ---
 
 ## Repertoire
