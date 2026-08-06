@@ -1,6 +1,6 @@
 {
   "name": "obsidian-folk-tune-review-plugin",
-  "version": "0.2.0-beta.3",
+  "version": "0.2.0-beta.4",
   "description": "Mobile-first Obsidian plugin for reviewing a repertoire of folk tunes.",
   "main": "main.js",
   "type": "module",
