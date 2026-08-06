@@ -6,9 +6,11 @@ describe("default vault seed", () => {
   it("embeds the default initialization content in the plugin bundle", () => {
     expect(DEFAULT_VAULT_SEED.folders).toContain("Repertoire/Tunes");
     expect(DEFAULT_VAULT_SEED.folders).toContain("Templates");
+    expect(DEFAULT_VAULT_SEED.folders).toContain(".obsidian/snippets");
     expect(DEFAULT_VAULT_SEED.files.map((file) => file.path)).toEqual(
       expect.arrayContaining([
         "README.md",
+        ".obsidian/snippets/hide-review-object.css",
         "Tunes Base.base",
         "Sets Base.base",
         "Templates/Tune Template.md",
@@ -28,5 +30,22 @@ describe("default vault seed", () => {
     expect(
       DEFAULT_VAULT_SEED.files.some((file) => file.contentType === "binary"),
     ).toBe(true);
+  });
+
+  it("includes the snippet that hides plugin-managed review metadata", () => {
+    expect(
+      DEFAULT_VAULT_SEED.files.find(
+        (file) => file.path === ".obsidian/snippets/hide-review-object.css",
+      ),
+    ).toEqual({
+      contentType: "text",
+      path: ".obsidian/snippets/hide-review-object.css",
+      text: [
+        '.metadata-property[data-property-key="review"] {',
+        "  display: none;",
+        "}",
+        "",
+      ].join("\n"),
+    });
   });
 });

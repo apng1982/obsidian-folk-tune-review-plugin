@@ -1,5 +1,6 @@
 import type {
   InitializationPlan,
+  VaultSeed,
   VaultSnapshot,
 } from "../domain/initialization-plan";
 
@@ -12,5 +13,5 @@ export interface VaultInitializer {
   applyInitializationPlan(
     plan: InitializationPlan,
   ): Promise<InitializationApplyResult>;
-  readSnapshot(): Promise<VaultSnapshot>;
+  readSnapshot(seed: VaultSeed): Promise<VaultSnapshot>;
 }

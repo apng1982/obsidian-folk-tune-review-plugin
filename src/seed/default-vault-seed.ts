@@ -19,7 +19,9 @@ export const DEFAULT_VAULT_SEED = {
     "Repertoire/Set Lists",
     "Repertoire/Sets",
     "Repertoire/Tunes",
-    "Templates"
+    "Templates",
+    ".obsidian",
+    ".obsidian/snippets"
   ],
   "files": [
     {
@@ -506,6 +508,11 @@ export const DEFAULT_VAULT_SEED = {
       "contentType": "text",
       "path": "Tunes Base.base",
       "text": "filters:\n  and:\n    - file.folder == \"Repertoire/Tunes\"\nproperties:\n  file.name:\n    displayName: Tune\nviews:\n  - type: table\n    name: Recent tunes learned\n    filters:\n      and:\n        - file.folder == \"Repertoire/Tunes\"\n        - learn == false\n        - learned >= (today() - \"60d\")\n    order:\n      - file.name\n      - key\n      - type\n      - origin\n      - learned\n      - mode\n      - composer\n    sort:\n      - property: learned\n        direction: DESC\n    columnSize:\n      note.key: 170\n      note.mode: 152\n  - type: table\n    name: Repertoire\n    filters:\n      and:\n        - file.folder == \"Repertoire/Tunes\"\n        - learn == false\n    order:\n      - file.name\n      - key\n      - type\n      - origin\n      - learn\n      - learned\n      - mode\n      - composer\n    sort:\n      - property: file.name\n        direction: DESC\n    columnSize:\n      note.key: 170\n      note.mode: 152\n  - type: table\n    name: Flagged tunes\n    filters:\n      and:\n        - file.folder == \"Repertoire/Tunes\"\n        - learn == false\n        - file.tags.contains(\"#flag\")\n    order:\n      - file.name\n      - key\n      - type\n      - origin\n      - learn\n      - learned\n      - mode\n      - composer\n    sort:\n      - property: learned\n        direction: DESC\n    columnSize:\n      note.key: 170\n      note.mode: 152\n  - type: table\n    name: Unplanned tunes to learn\n    filters:\n      and:\n        - file.folder == \"Repertoire/Tunes\"\n        - learn == true\n    order:\n      - file.name\n      - key\n      - type\n      - origin\n      - learn\n      - learned\n      - mode\n      - composer\n    sort:\n      - property: review\n        direction: DESC\n    columnSize:\n      note.key: 170\n      note.mode: 152\n  - type: table\n    name: In progress\n    filters:\n      and:\n        - file.folder == \"Repertoire/Tunes\"\n        - learn == true\n        - learned <= today()\n    order:\n      - file.name\n      - key\n      - type\n      - origin\n      - learned\n      - mode\n      - composer\n    sort:\n      - property: learned\n        direction: DESC\n    columnSize:\n      note.key: 170\n      note.mode: 152\n"
+    },
+    {
+      "contentType": "text",
+      "path": ".obsidian/snippets/hide-review-object.css",
+      "text": ".metadata-property[data-property-key=\"review\"] {\n  display: none;\n}\n"
     }
   ]
 } satisfies VaultSeed;

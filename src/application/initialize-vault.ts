@@ -12,7 +12,7 @@ export async function buildVaultInitializationPlan(
   initializer: VaultInitializer,
   seed: VaultSeed,
 ): Promise<InitializationPlan> {
-  return buildInitializationPlan(seed, await initializer.readSnapshot());
+  return buildInitializationPlan(seed, await initializer.readSnapshot(seed));
 }
 
 export async function applyVaultInitializationPlan(

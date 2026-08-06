@@ -8,6 +8,7 @@ const folders = [];
 const files = [];
 
 walk(seedSourceDirectory);
+addBuiltInSeedContent();
 
 const output = [
   "// Generated from requirements/initialise-vault-seed-content. Do not edit by hand.",
@@ -57,4 +58,19 @@ function walk(directory) {
       });
     }
   }
+}
+
+function addBuiltInSeedContent() {
+  folders.push(".obsidian");
+  folders.push(".obsidian/snippets");
+  files.push({
+    contentType: "text",
+    path: ".obsidian/snippets/hide-review-object.css",
+    text: [
+      '.metadata-property[data-property-key="review"] {',
+      "  display: none;",
+      "}",
+      "",
+    ].join("\n"),
+  });
 }

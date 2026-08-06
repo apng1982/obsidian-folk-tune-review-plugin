@@ -25,7 +25,7 @@ describe("initialize vault application use case", () => {
 
     const plan = await buildVaultInitializationPlan(initializer, seed);
 
-    expect(initializer.readSnapshot).toHaveBeenCalledOnce();
+    expect(initializer.readSnapshot).toHaveBeenCalledWith(seed);
     expect(plan.filesToCreate).toEqual(seed.files);
     expect(plan.foldersToCreate).toEqual(["Templates"]);
   });
