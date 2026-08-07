@@ -7,6 +7,10 @@ import {
   applyVaultInitializationPlan,
   buildVaultInitializationPlan,
 } from "./application/initialize-vault";
+import {
+  createStandardNoteFromTemplate,
+  type StandardTemplateNoteKind,
+} from "./application/create-note-from-template";
 import { buildTuneStats } from "./application/build-tune-stats";
 import { TuneFolderNotFoundError } from "./application/tune-folder-not-found-error";
 import type { ReviewMode } from "./domain/review-mode";
@@ -19,9 +23,14 @@ import {
 import { ObsidianNoteOpener } from "./obsidian/obsidian-note-opener";
 import { ObsidianNoteReader } from "./obsidian/obsidian-note-reader";
 import { ObsidianReviewWriter } from "./obsidian/obsidian-review-writer";
+import { ObsidianTemplateNoteCreator } from "./obsidian/obsidian-template-note-creator";
 import { ObsidianTuneRepository } from "./obsidian/obsidian-tune-repository";
 import { ObsidianVaultInitializer } from "./obsidian/obsidian-vault-initializer";
 import { SystemClock } from "./obsidian/system-clock";
+import {
+  TemplateNoteDestinationFolderNotFoundError,
+  TemplateNoteNotFoundError,
+} from "./ports/template-note-creator";
 import { DEFAULT_VAULT_SEED } from "./seed/default-vault-seed";
 import {
   DEFAULT_SETTINGS,
@@ -104,6 +113,27 @@ export default class FolkTuneReviewPlugin extends Plugin {
       name: "Add review to current tune",
       callback: () => {
         this.openCurrentTuneReview();
+      },
+    });
+    this.addCommand({
+      id: "new-tune",
+      name: "New Tune",
+      callback: () => {
+        void this.createStandardNote("tune");
+      },
+    });
+    this.addCommand({
+      id: "new-set",
+      name: "New Set",
+      callback: () => {
+        void this.createStandardNote("set");
+      },
+    });
+    this.addCommand({
+      id: "new-composer",
+      name: "New Composer",
+      callback: () => {
+        void this.createStandardNote("composer");
       },
     });
     this.addCommand({
@@ -210,6 +240,33 @@ export default class FolkTuneReviewPlugin extends Plugin {
         );
       },
     ).open();
+  }
+
+  private async createStandardNote(
+    kind: StandardTemplateNoteKind,
+  ): Promise<void> {
+    try {
+      await createStandardNoteFromTemplate(
+        new ObsidianTemplateNoteCreator(this.app),
+        kind,
+      );
+    } catch (error) {
+      if (error instanceof TemplateNoteNotFoundError) {
+        new Notice(
+          `Template not found: ${error.templatePath}. Run Initialize vault or restore the missing template.`,
+        );
+        return;
+      }
+
+      if (error instanceof TemplateNoteDestinationFolderNotFoundError) {
+        new Notice(
+          `Destination folder not found: ${error.destinationFolder}. Run Initialize vault.`,
+        );
+        return;
+      }
+
+      new Notice("Could not create note from template.");
+    }
   }
 
   private async openStats(): Promise<void> {
