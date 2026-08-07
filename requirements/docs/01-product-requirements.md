@@ -62,6 +62,17 @@ The plugin has three top-level areas:
 2. **Review** — build a review queue, show all selected tunes, run live or dry-run review sessions, and update latest review metadata.
 3. **Stats** — show review/tune status and summary information from note metadata.
 
+The plugin should also provide small Obsidian-native note creation commands for
+the common content types seeded by initialization:
+
+- **New Tune** - create a tune note from the user's tune template.
+- **New Set** - create a set note from the user's set template.
+- **New Composer** - create a composer note from the user's composer template.
+
+These commands replace the author's personal dependency on the Templater plugin
+for this narrow use case. They must not require Templater or any other template
+plugin.
+
 ## Explicit non-goals
 
 The plugin must not include:
@@ -101,6 +112,7 @@ A useful MVP must:
 - read tune metadata from frontmatter/cache;
 - build a review queue;
 - show all selected tunes before and during review;
+- create new tune, set, and composer notes from the initialized vault templates;
 - allow the current tune note to be reviewed directly when it is eligible;
 - show score buttons with interval days clearly visible;
 - support dry run mode with no writes;

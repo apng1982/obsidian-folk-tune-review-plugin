@@ -56,6 +56,27 @@ be redesigned during the re-code without an explicit decision.
 - The plugin must not interfere with vault sync operations.
 - Initial development proceeds one roadmap phase at a time.
 
+## Beta feedback decisions
+
+Accepted on 2026-08-07.
+
+- Add native note creation commands for the three initialized template types:
+  `Folk Tune Review: New Tune`, `Folk Tune Review: New Set`, and
+  `Folk Tune Review: New Composer`.
+- These commands remove the need for Templater for basic note creation. The
+  plugin must not depend on Templater or any other template plugin.
+- Commands use the user's current vault templates as source of truth:
+  `Templates/Tune Template.md`, `Templates/Set Template.md`, and
+  `Templates/Composer Template.md`.
+- Commands copy template content exactly as stored in the vault. No liquid,
+  Templater, date, or other expression expansion is required.
+- New tune notes are created in `Repertoire/Tunes`, new set notes in
+  `Repertoire/Sets`, and new composer notes in `Ref/Composer`.
+- New notes may be created as `Untitled.md` or the next safe unique variant, and
+  should be opened immediately so the user can rename and complete the note.
+- Missing templates or destination folders should produce a clear notice and no
+  partial note.
+
 ## Initial plugin metadata
 
 - ID: `folk-tune-review`

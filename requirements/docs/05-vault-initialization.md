@@ -176,6 +176,32 @@ created: <% tp.date.now("YYYY-MM-DD") %>
 
 The template should not include review metadata until a review has occurred.
 
+## Templates used by new note commands
+
+Initialization seeds three editable templates in the configured template folder:
+
+- `Templates/Tune Template.md`
+- `Templates/Set Template.md`
+- `Templates/Composer Template.md`
+
+The new note commands must treat these vault files as the source of truth:
+
+- `Folk Tune Review: New Tune` reads `Templates/Tune Template.md` and creates a
+  note in `Repertoire/Tunes`.
+- `Folk Tune Review: New Set` reads `Templates/Set Template.md` and creates a
+  note in `Repertoire/Sets`.
+- `Folk Tune Review: New Composer` reads `Templates/Composer Template.md` and
+  creates a note in `Ref/Composer`.
+
+The commands should copy the selected template content exactly as it exists in
+the user's vault at command time. User edits to the templates must be preserved
+and used. Template processing, date expansion, liquid syntax, or Templater
+integration is not required.
+
+Initialization remains responsible for creating the folders and default
+template notes. The new note commands should fail cleanly with an Obsidian
+notice if their destination folder or template note is missing.
+
 ## Validation
 
 Initialize and/or Validate should be able to report:
@@ -199,5 +225,6 @@ Initialization is acceptable when:
 - existing user content is not overwritten by default;
 - the operation is idempotent;
 - seed data is available offline;
+- seeded templates can be used by the new tune, set, and composer commands;
 - validation can run read-only;
 - all planning logic is unit tested.

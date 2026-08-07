@@ -189,6 +189,34 @@ Goals:
 - Review and extend public user documentation
 - Review and extend README.md summary for Obsidian community consumption
 
+## Beta feedback: native new-note commands
+
+Goals:
+
+- add `Folk Tune Review: New Tune`;
+- add `Folk Tune Review: New Set`;
+- add `Folk Tune Review: New Composer`;
+- create new tune notes in `Repertoire/Tunes`;
+- create new set notes in `Repertoire/Sets`;
+- create new composer notes in `Ref/Composer`;
+- read template content from the user's current vault templates in
+  `Templates/Tune Template.md`, `Templates/Set Template.md`, and
+  `Templates/Composer Template.md`;
+- copy template content exactly, with no Templater dependency and no template
+  expression expansion;
+- create notes as untitled/blank-title notes using a safe unique file name;
+- open the created note immediately so the user can rename and complete it.
+
+Acceptance criteria:
+
+- users can create tune, set, and composer notes without installing Templater;
+- each command writes to the correct folder;
+- user-edited template content is preserved and used;
+- missing templates or destination folders fail with a clear notice and no
+  partial note;
+- duplicate untitled note names are handled without overwriting existing notes;
+- new-note command logic is covered by application/adapter tests.
+
 
 ## Phase 8: Public/community readiness
 

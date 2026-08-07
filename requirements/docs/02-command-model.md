@@ -8,16 +8,22 @@ The plugin should therefore expose a small set of command palette entries that o
 
 ## Top-level command areas
 
-The product has three functional areas:
+The product has three core functional areas:
 
 1. Initialize
 2. Review
 3. Stats
 
+It also has a small native note creation utility area for creating standard
+tune, set, and composer notes from initialized templates.
+
 In the command palette these can be represented as named commands such as:
 
 ```text
 Folk Tune Review: Start review
+Folk Tune Review: New Tune
+Folk Tune Review: New Set
+Folk Tune Review: New Composer
 Folk Tune Review: Add review to current tune
 Folk Tune Review: Open stats
 Folk Tune Review: Admin - Initialize vault
@@ -65,6 +71,50 @@ bottom setting in the plugin settings tab.
 ## Dry run command behaviour
 
 Dry run means the review session can be run normally, but no tune metadata is written back to the vault.
+
+## New note command behaviour
+
+The plugin should provide three note creation commands:
+
+```text
+Folk Tune Review: New Tune
+Folk Tune Review: New Set
+Folk Tune Review: New Composer
+```
+
+These commands replace the need to install Templater for creating standard folk
+tune vault notes. They should use Obsidian vault APIs only and must work on
+desktop and mobile.
+
+Each command should:
+
+1. read the relevant template note from the configured template folder;
+2. create a new Markdown note in the correct destination folder;
+3. write the exact current template content into the new note;
+4. open the new note for editing after creation.
+
+The default template and destination mapping is:
+
+| Command | Template | Destination folder |
+| --- | --- | --- |
+| `Folk Tune Review: New Tune` | `Templates/Tune Template.md` | `Repertoire/Tunes` |
+| `Folk Tune Review: New Set` | `Templates/Set Template.md` | `Repertoire/Sets` |
+| `Folk Tune Review: New Composer` | `Templates/Composer Template.md` | `Ref/Composer` |
+
+The template must be read from the user's vault, not from the bundled seed
+constant, so user edits to the initialized templates are honored. No liquid,
+Templater, or other template expression processing is required.
+
+Because Obsidian notes require a file name, a new note may use `Untitled.md` or
+the next available unique variant such as `Untitled 1.md`. The command should
+help the user rename or title the note immediately after opening it where
+Obsidian APIs make that practical, for example by opening the note in editing
+mode and placing focus in a title/name field. The note body/frontmatter should
+otherwise remain exactly the template content.
+
+If the destination folder or template note is missing, the command should not
+create a partial note. It should show a concise Obsidian notice telling the user
+to run Initialize vault or restore the missing template.
 
 ## Current tune review command behaviour
 

@@ -18,6 +18,7 @@ This is a complete TypeScript re-code. Do not port the .NET CLI directly. Treat 
 - No Electron APIs.
 - No shell commands.
 - No dependency on the .NET CLI.
+- No dependency on Templater.
 - No runtime network calls for core behaviour.
 - No `pick` command.
 - No review notes/comments.
@@ -33,16 +34,46 @@ Implement these command areas:
 1. Initialize
 2. Review
 3. Stats
+4. Note creation
 
 Likely command palette entries:
 
 ```text
 Folk Tune Review: Start review
+Folk Tune Review: New Tune
+Folk Tune Review: New Set
+Folk Tune Review: New Composer
 Folk Tune Review: Add review to current tune
 Folk Tune Review: Open stats
 Folk Tune Review: Initialize vault
 Folk Tune Review: Validate vault
 ```
+
+## New note commands
+
+Implement three native Obsidian note creation commands:
+
+- `Folk Tune Review: New Tune`
+- `Folk Tune Review: New Set`
+- `Folk Tune Review: New Composer`
+
+They replace the author's personal Templater workflow for creating standard
+tune, set, and composer notes. Do not add a Templater dependency.
+
+Use this mapping:
+
+| Command | Template source | Destination folder |
+| --- | --- | --- |
+| `Folk Tune Review: New Tune` | `Templates/Tune Template.md` | `Repertoire/Tunes` |
+| `Folk Tune Review: New Set` | `Templates/Set Template.md` | `Repertoire/Sets` |
+| `Folk Tune Review: New Composer` | `Templates/Composer Template.md` | `Ref/Composer` |
+
+Read the template source from the user's vault at command time so modified
+templates are honored. Copy the content exactly; do not expand template
+expressions. Create the note with an untitled/blank-title workflow, using a safe
+unique Markdown path such as `Untitled.md`, then open it immediately for
+editing. If the template or destination folder is missing, show a concise notice
+and create nothing.
 
 ## Review flow
 

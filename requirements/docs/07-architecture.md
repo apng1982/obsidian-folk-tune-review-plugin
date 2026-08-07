@@ -37,12 +37,14 @@ src/
     complete-review-item.ts
     calculate-stats.ts
     initialize-vault.ts
+    create-note-from-template.ts
     validate-vault.ts
 
   ports/
     tune-repository.ts
     review-writer.ts
     note-opener.ts
+    template-note-repository.ts
     settings-store.ts
     clock.ts
 
@@ -95,6 +97,7 @@ Example use cases:
 - calculate stats;
 - build initialization plan;
 - apply initialization plan;
+- create a tune, set, or composer note from the user's current vault template;
 - validate vault.
 
 The application layer should be mostly testable with fake ports.
@@ -121,7 +124,14 @@ export interface Clock {
 }
 ```
 
-More ports can be added for initialization and settings.
+The new note commands should be implemented through application-level logic and
+ports so the rules can be tested without Obsidian. The application logic should
+know the command type, template path, destination folder, and collision policy.
+The Obsidian adapter should perform the actual vault reads, file creation, and
+workspace opening.
+
+More ports can be added for initialization, template note creation, and
+settings.
 
 ## Obsidian adapter layer
 
@@ -134,6 +144,8 @@ Responsibilities:
 - map Obsidian files to domain `Tune` objects;
 - update frontmatter via `app.fileManager.processFrontMatter`;
 - open tune notes in the workspace;
+- read template note content from the configured template folder;
+- create new Markdown notes in configured destination folders;
 - save/load plugin settings;
 - create folders and seed notes through vault APIs.
 

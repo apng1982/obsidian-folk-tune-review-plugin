@@ -64,6 +64,10 @@ Required coverage areas:
 - stats use case does not write;
 - initialization preview does not write;
 - initialization apply writes only planned changes.
+- new-note creation reads the vault template content;
+- new-note creation writes to the correct destination folder;
+- new-note creation opens the created note;
+- missing template or destination folder prevents note creation.
 
 ### 3. Obsidian adapter tests
 
@@ -78,6 +82,7 @@ Testable pieces:
 - settings default merging;
 - `dev/test mode` and never-reviewed prioritisation default merging;
 - seed plan to vault operations;
+- template-path and destination-path normalization for new-note commands;
 - path normalization using Obsidian-style vault paths.
 
 ### 4. Integration tests
@@ -191,6 +196,24 @@ Initialization tests should cover:
 - missing folder creation;
 - missing template creation;
 - apply plan calls the expected writer operations.
+
+## New note command test requirements
+
+New tune/set/composer command tests should prove:
+
+- `Folk Tune Review: New Tune` reads `Templates/Tune Template.md` and creates a
+  note under `Repertoire/Tunes`;
+- `Folk Tune Review: New Set` reads `Templates/Set Template.md` and creates a
+  note under `Repertoire/Sets`;
+- `Folk Tune Review: New Composer` reads `Templates/Composer Template.md` and
+  creates a note under `Ref/Composer`;
+- the created note body/frontmatter exactly matches the current template file
+  content;
+- user-edited template content is used instead of bundled seed content;
+- no Templater or other template expansion is performed;
+- duplicate `Untitled.md` names use the next safe unique Obsidian path;
+- missing template or destination folder shows a notice and creates no note;
+- after creation, the new note is opened for editing.
 
 ## CI requirements
 
