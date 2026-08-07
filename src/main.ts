@@ -117,21 +117,21 @@ export default class FolkTuneReviewPlugin extends Plugin {
     });
     this.addCommand({
       id: "new-tune",
-      name: "New Tune",
+      name: "New tune",
       callback: () => {
         void this.createStandardNote("tune");
       },
     });
     this.addCommand({
       id: "new-set",
-      name: "New Set",
+      name: "New set",
       callback: () => {
         void this.createStandardNote("set");
       },
     });
     this.addCommand({
       id: "new-composer",
-      name: "New Composer",
+      name: "New composer",
       callback: () => {
         void this.createStandardNote("composer");
       },
